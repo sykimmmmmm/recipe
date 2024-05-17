@@ -1,13 +1,24 @@
-import { Route, Routes } from 'react-router-dom';
-import {Home, NotFound, Register} from './pages/index'
+import { Route, Routes, useLocation } from 'react-router-dom';
+import Header from './Component/Header';
+import {Home, NotFound, Register, Mypage, AddRecipe, Recipe} from './pages/index'
 
 function App() {
+  const location = useLocation()
+  console.log(location)
   return (
-    <Routes>
-      <Route path='/' element={<Home/>}/>
-      <Route path='/register' element={<Register/>}/>
-      <Route path='*' element={<NotFound/>}/>
-    </Routes>
+    <>
+      {location.pathname !== '/user/register' ? <Header/>: ''}
+      <Routes>
+        <Route path='/' element={<Home/>}/>
+        <Route path='/user/register' element={<Register/>}/>
+        <Route path='/user/mypage' element={<Mypage/>}/>
+        <Route path='/recipe' element={<Recipe/>}>
+          <Route path=':id' element={<Recipe/>}/>
+        </Route>
+        <Route path='/add-recipe' element={<AddRecipe/>}/>
+        <Route path='*' element={<NotFound/>}/>
+      </Routes>
+    </>
   );
 }
 

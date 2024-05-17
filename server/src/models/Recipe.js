@@ -18,7 +18,7 @@ const recipeSchema = new Schema({
     },
     videoLink:{
         type: String,
-        default: false,
+        default: null,
         trim:true
     },
     author:{
@@ -43,6 +43,18 @@ const recipeSchema = new Schema({
     tag:{
         type: String,
         trim:true
+    },
+    viewership:{
+        type: Number,
+        default:0
+    },
+    wishlisted:{
+        type: Number,
+        default:0
+    },
+    recommended:{
+        type:Number,
+        default:0
     },
     cookingImgs:[],
     finishedImgs:[],

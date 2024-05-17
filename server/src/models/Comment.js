@@ -28,6 +28,10 @@ const commentSchema = new Schema({
     lastModifiedAt:{
         type:Date,
         default: Date.now
+    },
+    originComment:{
+        type: ObjectId,
+        ref:'Comment'
     }
 })
 
