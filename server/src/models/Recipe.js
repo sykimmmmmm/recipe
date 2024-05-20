@@ -7,6 +7,11 @@ const recipeSchema = new Schema({
         type: Mixed,
         required: true
     },
+    recipeTitle:{
+        type: String,
+        required: true,
+        trim:true
+    },
     name:{
         type: String,
         required: true,
@@ -15,11 +20,6 @@ const recipeSchema = new Schema({
     description:{
         type: String,
         required: true
-    },
-    videoLink:{
-        type: String,
-        default: null,
-        trim:true
     },
     author:{
         type: ObjectId,

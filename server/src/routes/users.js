@@ -1,6 +1,8 @@
 const express = require('express')
 const User = require('../models/User')
 const expressAsyncHandler = require('express-async-handler')
+const { generateToken, isAuth, isAdmin } = require('../../auth')
+
 const router = express.Router()
 
 
@@ -22,5 +24,24 @@ router.post('/register',expressAsyncHandler(async(req,res,next)=>{
     }
 }))
 
+
+router.post('/login',expressAsyncHandler( async(req,res,next)=>{
+    const loginUser = await User.findOne({
+        userId: req.body.userId,
+        password: req.body.password
+    })
+    if(!loginUser){
+        res.status(401).json({
+            code:401, message:'Invalid Email or Password'
+        })
+    }else{
+        const { name, userId, isAdmin, createdAt } = loginUser
+        res.json({
+            code:200,
+            token: generateToken(loginUser),
+            name,userId,isAdmin,createdAt
+        })
+    }
+}))
 
 module.exports = router

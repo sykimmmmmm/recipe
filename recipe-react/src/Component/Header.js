@@ -8,7 +8,11 @@ export default function Header(){
         const {name,value} = queryString.current
         setSearchParams({[name]:value})
     }
-
+    const logout=()=>{
+        alert('로그아웃했습니다')
+        sessionStorage.removeItem('UID')
+    }
+    console.log(window.user)
     return(
         <div>
             <div className="header-logo">
@@ -22,7 +26,10 @@ export default function Header(){
             </div>
             <div>
                 <div>
-                    <Link to={'user/login'}>로그인</Link>
+                    {sessionStorage.getItem('UID') ? 
+                    <Link to={'/'} onClick={logout}>로그아웃</Link>:
+                    <Link to={'/user/login'}>로그인</Link>
+                    }
                 </div>
             </div>
         </div>

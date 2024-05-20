@@ -1,6 +1,7 @@
 const express = require('express')
 const app = express()
 const userRouter = require('./src/routes/users')
+const recipeRouter = require('./src/routes/recipe')
 const mongoose = require('mongoose')
 const config = require('./config')
 const cors = require('cors')
@@ -20,7 +21,7 @@ mongoose.connect(config.MONGODB_URL)
 .catch(e => console.log(`연동 실패 ${e}`))
 
 app.use('/users',userRouter)
-
+app.use('/recipes',recipeRouter)
 
 
 

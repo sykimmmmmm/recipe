@@ -2,7 +2,6 @@ import React, { useState, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
 export default function Register(){
-    const navigate = useNavigate()
     const [loginData,setLoginData] = useState({})
     const [registerData,setRegisterData] = useState()
     const homeRef = useRef()
@@ -16,9 +15,6 @@ export default function Register(){
             body:JSON.stringify({email,name,userId,password,confirmPassword})
         }).then(res => res.json())
         alert(register.msg)
-        if(register.code === 200){
-            navigate('/',{state:{data:register}})
-        }
         return setRegisterData(register)
     }
 
@@ -64,7 +60,7 @@ export default function Register(){
             </form>
             <button onClick={register}>회원가입</button>
         </div>
-        { registerData && registerData.code===200 && <Link to={'/'} ref={homeRef}>home</Link>}
+        { registerData && registerData.code===200 && <Link to={'/'} ref={homeRef} style={{display:"none"}}>home</Link>}
         </>
     )
 }
