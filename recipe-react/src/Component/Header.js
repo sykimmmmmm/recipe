@@ -12,7 +12,6 @@ export default function Header(){
         alert('로그아웃했습니다')
         sessionStorage.removeItem('UID')
     }
-    console.log(window.user)
     return(
         <div>
             <div className="header-logo">
