@@ -1,6 +1,7 @@
 import { Route, Routes, useLocation } from 'react-router-dom';
 import Header from './Component/Header';
 import {Home, NotFound, Register, Mypage, AddRecipe, Recipe, Login} from './pages/index'
+import TestAdd from './pages/TestAdd';
 
 function App() {
   const location = useLocation()
@@ -17,6 +18,7 @@ function App() {
           <Route path=':id' element={<Recipe/>}/>
         </Route>
         <Route path='/add-recipe' element={<AddRecipe/>}/>
+        <Route path='/test' element={<TestAdd/>}/>
         <Route path='*' element={<NotFound/>}/>
       </Routes>
     </>
