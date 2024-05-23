@@ -1,6 +1,6 @@
 import React, { useRef } from "react";
 import { Link,useSearchParams } from "react-router-dom";
-
+import './styles/Header.css'
 export default function Header(){
     const [searchParams,setSearchParams] = useSearchParams()
     const queryString = useRef()
@@ -13,7 +13,7 @@ export default function Header(){
         sessionStorage.removeItem('UID')
     }
     return(
-        <div>
+        <div className="header">
             <div className="header-logo">
                 <Link to={'/'}>
                     <img src="" alt='myrecipe'></img>

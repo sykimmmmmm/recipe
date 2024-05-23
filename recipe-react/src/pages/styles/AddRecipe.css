@@ -1,7 +1,29 @@
+.wrapper{
+    box-sizing: border-box;
+    border: 1px solid #aaa;
+    width: 100%;
+
+}
+.addForm{
+    box-sizing: border-box;
+    border: 1px solid blue;
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+}
 .ingredients{
     display: flex;
     flex-direction: column;
     gap: 10px;
+    width: 80%;
+    justify-content: center;
+}
+.ingredients > div{
+    display: flex;
+    gap: 20px;
+}
+.addForm textarea{
+    resize: none;
 }
 .btn{
     border: 1px solid red;
