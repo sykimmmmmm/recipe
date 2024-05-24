@@ -1,6 +1,7 @@
 import React, { useRef } from "react";
 import { Link,useSearchParams } from "react-router-dom";
 import './styles/Header.css'
+import axios from 'axios'
 export default function Header(){
     const [searchParams,setSearchParams] = useSearchParams()
     const queryString = useRef()
@@ -10,7 +11,8 @@ export default function Header(){
     }
     const logout=()=>{
         alert('로그아웃했습니다')
-        sessionStorage.removeItem('UID')
+        axios.defaults.headers.common['Authorization'] = ``
+        sessionStorage.removeItem('iL')
     }
     return(
         <div className="header">
@@ -24,12 +26,16 @@ export default function Header(){
                 <button onClick={searchQuery}>검색</button>
             </div>
             <div>
-                <div>
-                    {sessionStorage.getItem('UID') ? 
-                    <Link to={'/'} onClick={logout}>로그아웃</Link>:
+                {sessionStorage.getItem('iL') ? 
+                <>
+                    <Link to={'/user/mypage'}>마이페이지</Link>
+                    <Link to={'/'} onClick={logout}>로그아웃</Link>
+                </>:
+                <>
+                    <Link to={'/user/register'}>회원가입</Link>
                     <Link to={'/user/login'}>로그인</Link>
-                    }
-                </div>
+                </>
+                }
             </div>
         </div>
     )

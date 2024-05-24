@@ -1,10 +1,12 @@
 import { Route, Routes, useLocation } from 'react-router-dom';
 import Header from './Component/Header';
 import {Home, NotFound, Register, Mypage, AddRecipe, Recipe, Login} from './pages/index'
+import axios from 'axios'
+
 
 function App() {
   const location = useLocation()
-  console.log(location)
+  axios.defaults.withCredentials=true
   return (
     <>
       {location.pathname !== '/user/register' ? <Header/>: ''}

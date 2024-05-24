@@ -1,5 +1,9 @@
 import React, { useState } from "react";
+import axios from 'axios'
 import { useNavigate } from "react-router-dom";
+
+axios.defaults.baseURL='http://localhost:4000'
+axios.defaults.withCredentials=true
 
 export default function Login(){
     const navigate = useNavigate()
@@ -10,20 +14,35 @@ export default function Login(){
     }
     const login = async() =>{
         const {userId, password} = loginData
-        const loginUser = await fetch('http://localhost:4000/users/login',{
-            headers:{
-                'Content-Type':'application/json',
-            },
-            method:'POST',
-            body: JSON.stringify({userId,password})
-        }).then(res=> res.json())
-        if(loginUser.code === 401){
-            alert(loginUser.message)
-        }else{
-            sessionStorage.setItem('UID',JSON.stringify(loginUser.token))
-            navigate('/')
-        }
-        console.log(loginUser)
+        axios.post('/users/login',{userId,password})
+        .then(res=> {
+            const {code,token} =res.data
+            console.log(res.data)
+            axios.defaults.headers.common['Authorization'] = `Bearer ${token}`
+            if(code === 200){
+                alert('로그인되었습니다')
+                sessionStorage.setItem('iL',true)
+                navigate('/')
+            }
+        })
+        .catch(e=>{
+            const {data:{message}} = e.response
+            alert(message)
+        })
+        // const loginUser = await fetch('http://localhost:4000/users/login',{
+        //     headers:{
+        //         'Content-Type':'application/json',
+        //     },
+        //     method:'POST',
+        //     body: JSON.stringify({userId,password})
+        // }).then(res=> res.json())
+        // if(loginUser.code === 401){
+        //     alert(loginUser.message)
+        // }else{
+        //     sessionStorage.setItem('UID',btoa(JSON.stringify(loginUser.token)))
+        //     navigate('/')
+        // }
+        // console.log(loginUser)
     }
 
     return(
