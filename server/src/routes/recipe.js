@@ -9,7 +9,7 @@ const router = express.Router()
 const upload = multer({
     storage: multer.diskStorage({
         destination: function( req, file, cb){
-            cb(null,'uploads/')
+            cb(null,'public/uploads/')
         },
         filename: function(req, file, cb){
             const ext = path.extname(file.originalname)
@@ -18,10 +18,10 @@ const upload = multer({
         }
     })
 })
-router.post('/upload', upload.single('recipeImage'), expressAsyncHandler( async (req,res,next)=>{
+router.post('/upload', isAuth,upload.single('recipeImage'), expressAsyncHandler( async (req,res,next)=>{
     console.log(req.file)
     const image = new Image({
-        path: req.file.path
+        path: req.file.path.slice(7,req.file.path.length)
     })
     try{
         const newImage = await image.save()
@@ -55,5 +55,9 @@ router.post('/add-recipe',isAuth,expressAsyncHandler( async (req,res,next)=>{
     }
 }))
 
+router.get('/recipe-list',expressAsyncHandler(async (req,res,next)=>{
+    const recipe = await Recipe.find().populate('cookingImgs',['-_id','path']).populate('author','-_id').populate('finishedImgs','-_id').populate('rating','-_id')
+    res.json({code:200, msg:'데이터를 불러왔습니다', recipe})
+}))
 
 module.exports = router

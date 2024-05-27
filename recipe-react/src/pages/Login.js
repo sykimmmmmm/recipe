@@ -21,28 +21,13 @@ export default function Login(){
             axios.defaults.headers.common['Authorization'] = `Bearer ${token}`
             if(code === 200){
                 alert('로그인되었습니다')
-                sessionStorage.setItem('iL',true)
+                sessionStorage.setItem('I',btoa(JSON.stringify(token)))
                 navigate('/')
             }
         })
         .catch(e=>{
-            const {data:{message}} = e.response
-            alert(message)
+            alert(e)
         })
-        // const loginUser = await fetch('http://localhost:4000/users/login',{
-        //     headers:{
-        //         'Content-Type':'application/json',
-        //     },
-        //     method:'POST',
-        //     body: JSON.stringify({userId,password})
-        // }).then(res=> res.json())
-        // if(loginUser.code === 401){
-        //     alert(loginUser.message)
-        // }else{
-        //     sessionStorage.setItem('UID',btoa(JSON.stringify(loginUser.token)))
-        //     navigate('/')
-        // }
-        // console.log(loginUser)
     }
 
     return(

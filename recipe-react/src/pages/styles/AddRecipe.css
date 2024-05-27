@@ -56,6 +56,13 @@
     gap: 10px;
     justify-content: center;
 }
+.steps >div{
+    display: flex;
+    align-items: center;
+}
+.steps > div > div {
+    cursor: pointer;
+}
 .btn{
     border: 1px solid red;
     width: 100px;

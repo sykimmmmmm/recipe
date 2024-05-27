@@ -12,7 +12,7 @@ export default function Header(){
     const logout=()=>{
         alert('로그아웃했습니다')
         axios.defaults.headers.common['Authorization'] = ``
-        sessionStorage.removeItem('iL')
+        sessionStorage.removeItem('I')
     }
     return(
         <div className="header">
@@ -26,7 +26,7 @@ export default function Header(){
                 <button onClick={searchQuery}>검색</button>
             </div>
             <div>
-                {sessionStorage.getItem('iL') ? 
+                {sessionStorage.getItem('I') ? 
                 <>
                     <Link to={'/user/mypage'}>마이페이지</Link>
                     <Link to={'/'} onClick={logout}>로그아웃</Link>

@@ -2,6 +2,7 @@ import React,{useEffect, useRef, useState} from 'react';
 import IngredientForm from '../Component/IngredientForm';
 import axios from 'axios'
 import './styles/AddRecipe.css'
+import StepsForm from '../Component/StepsForm';
 const people = ['1인분','2인분','3인분','4인분','5인분','6인분 이상']
 const time = ['5분 이내','10분 이내','15분 이내','20분 이내','30분 이내','60분 이내','90분 이내','2시간 이내','2시간 이상']
 const difficult = ['누구나 가능','쉬움','보통','어려움','매우 어려움']
@@ -21,6 +22,18 @@ export default function AddRecipe(){
     const handleInputChange = (id, field, value) => {
         inputRef.current=({...inputRef.current,[id]: (inputRef.current[id]?{...inputRef.current[id],[field]: value}:{[field]:value})})
     }
+    const stepsRef = useRef({0:{steps:'',file:''}})
+    const [urlLink,setUrlLink] = useState([])
+    const stepsInputChange = (id, field, value='') => {
+        stepsRef.current=({...stepsRef.current,[id]: (stepsRef.current[id]?{...stepsRef.current[id],[field]: value}:{[field]:value})})
+        const reader = new FileReader()
+        stepsRef.current[id].file !== '' ? reader.readAsDataURL(stepsRef.current[id].file): console.log('1')
+        reader.onloadend = ()=>{
+            // urlLink.push(reader.result)
+            setUrlLink(...urlLink,reader.result)
+        }
+    }
+    console.log(urlLink)
     const fileRef = useRef()
     const createRecipe = async(e)=>{
         e.stopPropagation()
@@ -53,56 +66,36 @@ export default function AddRecipe(){
             return alert('빠진 항목이있습니다')
         }
     } 
-    const previewRef = useRef()
-    const [preview,setPreview] = useState()
+    let imgs = []
     useEffect(()=>{
         const recipeSave = async()=>{
-            // const token = JSON.parse(atob(sessionStorage.getItem('UID')))
+            const token = JSON.parse(atob(sessionStorage.getItem('I')))
+            
             const fd = new FormData()
             fd.append('recipeImage',fileRef.current.files[0])
             await axios.post('recipes/upload',fd,{headers:{'Content-Type':'multipart/form-data'}})
             .then(res => {
-                console.log(res.data)
-                setPreview(res.data.newImage._id)
+                console.log(res.data.code)
+                imgs.push(res.data.newImage)
             })
-            await setTimeout(()=>{},100)
             const {recipeTitle,name,description,people,time,difficult,steps,type,situation,process,material,open,ingredients} = recipeData
             await axios.post('/recipes/add-recipe',{
-                recipeTitle,name,description,info:[people,time,difficult],ingredients,steps,category:[type,situation,process,material],open, cookingImgs:[preview]
-            })
+                recipeTitle,name,description,info:[people,time,difficult],ingredients,steps,category:[type,situation,process,material],open, cookingImgs:imgs
+            },{headers:{Authorization:`Bearer ${token}`}})
             .then(res => {
                 const {message} = res.data
                 console.log(res.data)
                 alert(message)
             })
             .catch(e=>{
-                // const {data:{message}}= e.response
                 console.log(e)
-                // alert(message)
             })
-
-            // const newRecipe = await fetch('http://localhost:4000/recipes/add-recipe',{
-            //     headers:{
-            //         'Content-Type':'application/json',
-            //         'Authorization':`Bearer ${token}`
-            //     },
-            //     method:'POST',
-            //     body:JSON.stringify({
-            //         recipeTitle,name,description,info:[people,time,difficult],ingredients,steps,category:[type,situation,process,material],open
-            //     })
-            // }).then(res=>res.json())
-            // if(newRecipe.code === 400){
-            //     alert(newRecipe.message)
-            // }else{
-            //     alert(newRecipe.message)
-            //     console.log(newRecipe)
-            // }
         }
         if(validateValue(recipeData)){
             recipeSave()
         }
     },[recipeData])
-    console.log(preview)
+    // console.log(stepsRef)
     return(
         <>
         <div className='wrapper'>
@@ -191,18 +184,21 @@ export default function AddRecipe(){
                 </div>
                 <IngredientForm changeHandler={handleInputChange}ref={inputRef}></IngredientForm>
                 <div className='steps'>
-                    <label>
-                        스텝:
-                        <textarea cols={50} rows={5} type={'text'} placeholder='조리법을 입력하세요' name='steps' defaultValue={''}/>
-                    </label>
-                    <input type={'file'} name='recipeImage' ref={fileRef}/>
+                    <div>
+                        <label>
+                            스텝:
+                            <textarea cols={50} rows={5} type={'text'} placeholder='조리법을 입력하세요' name='steps' defaultValue={''}/>
+                        </label>
+                        <input type={'file'} name='recipeImage' ref={fileRef}/>
+                    </div>
                 </div>
+                <StepsForm changeHandler={stepsInputChange} ref={stepsRef} url={urlLink}/>
             </div>
             <button name='save' onClick={createRecipe}>레시피 저장</button>
             <button name='upload' onClick={createRecipe}>레시피 공유</button>
         </div>
-        {preview && <div className='filePreview'>
-            <img src={preview.path} alt='d'/>
+        {imgs.length>0 && <div className='filePreview'>
+            <img src={imgs.path} alt='d'/>
         </div>}
         </>
     )
@@ -279,3 +275,7 @@ let a = ingValue2.map((value,id)=>{
                     })}
                     <div className='btn' onClick={addingredient}>재료 추가</div>
                 </div> */}
+function sleep(ms) {
+    const wakeUpTime = Date.now() + ms;
+    while (Date.now() < wakeUpTime) {}
+}

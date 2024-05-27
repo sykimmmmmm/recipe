@@ -56,8 +56,8 @@ const recipeSchema = new Schema({
         type:Number,
         default:0
     },
-    cookingImgs:[{type:ObjectId,ref:'Image'}],
-    finishedImgs:[],
+    cookingImgs:[{type:ObjectId,ref:"Image"}],
+    finishedImgs:[{type:ObjectId,ref:"Image"}],
     open:{
         type: Boolean,
         default : false,
