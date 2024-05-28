@@ -13,50 +13,63 @@ const material = ['소고기','돼지고기','닭고기','육류','채소류','�
 
 export default function AddRecipe(){
     const [recipeData,setRecipeData] = useState({'recipeTitle':'','name':'','description':'','people':'','time':'','difficult':'','ingredients0':'','steps':'','type':'','situation':'','process':'','material':''})
-    const recipeRef = useRef({'recipeTitle':'','name':'','description':'','people':'','time':'','difficult':'','steps':'','type':'','situation':'','process':'','material':''})
+    const recipeRef = useRef({'recipeTitle':'','name':'','description':'','people':'','time':'','difficult':'','type':'','situation':'','process':'','material':''})
+    // 레시피 정보 입력
     const inputRecipe = (e)=>{
         let {name, value} = e.target
         recipeRef.current = {...recipeRef.current,[name]:value}
     }
+    //ingredientForm 정보 저장
     const inputRef = useRef({0:{ingredient:'',quantity:'',unit:''}})
     const handleInputChange = (id, field, value) => {
         inputRef.current=({...inputRef.current,[id]: (inputRef.current[id]?{...inputRef.current[id],[field]: value}:{[field]:value})})
     }
-    const stepsRef = useRef({0:{steps:'',file:''}})
-    const [urlLink,setUrlLink] = useState([])
-    const stepsInputChange = (id, field, value='') => {
-        stepsRef.current=({...stepsRef.current,[id]: (stepsRef.current[id]?{...stepsRef.current[id],[field]: value}:{[field]:value})})
-        const reader = new FileReader()
-        stepsRef.current[id].file !== '' ? reader.readAsDataURL(stepsRef.current[id].file): console.log('1')
-        reader.onloadend = ()=>{
-            // urlLink.push(reader.result)
-            setUrlLink(...urlLink,reader.result)
+    // stepsForm 정보 저장
+    const stepsRef = useRef({0:{steps:'',file:'',id:''}})
+    // stepsForm 이미지 첨부시 프리뷰
+    const [urlLink,setUrlLink] = useState()
+    const [prevFile,setPrevFile] = useState({})
+    const stepsInputChange = (id, field, value) => {
+        stepsRef.current=({...stepsRef.current,[id]: (stepsRef.current[id]?{...stepsRef.current[id],['id']:id,[field]: value}:{[field]:value})})
+        const keys = Object.keys(stepsRef.current)
+        keys.map((key)=>{
+            if(stepsRef.current[key].file === ''){
+                return stepsRef.current[key].id = undefined
+            }else return stepsRef.current[key].id = id
+        })
+        if(prevFile[id] !== stepsRef.current[id].file.name){
+            setPrevFile({...prevFile,[id]:stepsRef.current[id].file.name})
+            setUrlLink({...urlLink,[id]:{src:URL.createObjectURL(stepsRef.current[id].file)}})
         }
     }
-    console.log(urlLink)
-    const fileRef = useRef()
+
+    //레시피 만들기 레시피데이터 저장
     const createRecipe = async(e)=>{
         e.stopPropagation()
+        // 재료정보 결합
         const keys = Object.keys(inputRef.current)
-        const ingredient = []
-        keys.forEach((key,id)=>{
-            let target = inputRef.current[id]
+        const ingredients = []
+        keys.forEach((key)=>{
+            let target = inputRef.current[key]
             let value = ''
-            console.log(inputRef.current[id])
             if(target.ingredient === ''||target.quantity === ''||target.unit === ''){
                 value = 'undefined'
             }else{
                 value = target.ingredient+''+target.quantity+''+target.unit
             }
-            ingredient.push(value)
+            ingredients.push(value)
         })
-        const ingredients =[]
-        ingredient.forEach((val,id)=>{
-            ingredients.push(val) 
+        const stepsKey = Object.keys(stepsRef.current)
+        const steps=[]
+        stepsKey.forEach((key,id)=>{
+            let target = stepsRef.current[key]
+            let value = ''
+            if(target.steps === ''){value = 'undefined'}
+            else{value= target.steps}
+            steps.push(value)
         })
-
-        if(validateValue(recipeRef.current)&&validateValue(ingredients)){
-            const {recipeTitle,name,description,people,time,difficult,steps,type,situation,process,material} = recipeRef.current
+        if(validateValue(recipeRef.current)&&validateValue(ingredients)&&validateValue(steps)){
+            const {recipeTitle,name,description,people,time,difficult,type,situation,process,material} = recipeRef.current
             if(e.target.name === 'save'){
                 setRecipeData({recipeTitle,name,description,people,time,difficult,steps,type,situation,process,material,open:false,ingredients:ingredients})
             }else if(e.target.name === 'upload'){
@@ -66,25 +79,32 @@ export default function AddRecipe(){
             return alert('빠진 항목이있습니다')
         }
     } 
-    let imgs = []
+
+    // 레시피데이터가 저장되면 레시피 db로 저장
     useEffect(()=>{
         const recipeSave = async()=>{
             const token = JSON.parse(atob(sessionStorage.getItem('I')))
-            
+            let imgs = []            
             const fd = new FormData()
-            fd.append('recipeImage',fileRef.current.files[0])
-            await axios.post('recipes/upload',fd,{headers:{'Content-Type':'multipart/form-data'}})
+            for(let i in stepsRef.current){
+                fd.append('recipeImage',stepsRef.current[i].file)
+                fd.append('id',stepsRef.current[i].id)
+            }
+            await axios.post('recipes/upload',fd,{headers:{'Content-Type':'multipart/form-data','Authorization':`Bearer ${token}`}})
             .then(res => {
-                console.log(res.data.code)
-                imgs.push(res.data.newImage)
+                // console.log(res.data)
+                res.data.images.forEach(data=>{
+                    imgs.push(data.value)
+                })
             })
+            // console.log(imgs)
             const {recipeTitle,name,description,people,time,difficult,steps,type,situation,process,material,open,ingredients} = recipeData
             await axios.post('/recipes/add-recipe',{
                 recipeTitle,name,description,info:[people,time,difficult],ingredients,steps,category:[type,situation,process,material],open, cookingImgs:imgs
             },{headers:{Authorization:`Bearer ${token}`}})
             .then(res => {
                 const {message} = res.data
-                console.log(res.data)
+                // console.log(res.data)
                 alert(message)
             })
             .catch(e=>{
@@ -95,9 +115,8 @@ export default function AddRecipe(){
             recipeSave()
         }
     },[recipeData])
-    // console.log(stepsRef)
+
     return(
-        <>
         <div className='wrapper'>
             <div className='addForm' onChange={inputRecipe}>
                 <div className="basicInfo">
@@ -183,24 +202,11 @@ export default function AddRecipe(){
                     </div>  
                 </div>
                 <IngredientForm changeHandler={handleInputChange}ref={inputRef}></IngredientForm>
-                <div className='steps'>
-                    <div>
-                        <label>
-                            스텝:
-                            <textarea cols={50} rows={5} type={'text'} placeholder='조리법을 입력하세요' name='steps' defaultValue={''}/>
-                        </label>
-                        <input type={'file'} name='recipeImage' ref={fileRef}/>
-                    </div>
-                </div>
                 <StepsForm changeHandler={stepsInputChange} ref={stepsRef} url={urlLink}/>
             </div>
             <button name='save' onClick={createRecipe}>레시피 저장</button>
             <button name='upload' onClick={createRecipe}>레시피 공유</button>
         </div>
-        {imgs.length>0 && <div className='filePreview'>
-            <img src={imgs.path} alt='d'/>
-        </div>}
-        </>
     )
 }
 
@@ -208,74 +214,3 @@ const validateValue = (obj)=>{
     return !Object.values(obj).includes('undefined')&&!Object.values(obj).includes('')
 }
 
-
-/* const obj = {}
-let a = ingValue2.map((value,id)=>{
-    console.log(value)
-    if(value.length === 3 && !value.includes('')){
-        obj[`ingredients${id}`] = value.join('')
-    }else{
-        obj[`ingredients${id}`] = undefined
-    }
-}) */
-// const addingredient=(e)=>{
-//     e.stopPropagation()
-//     console.log(e.target)
-//     setCnt(cnt+1)
-//     setIngredient([...ingredient,cnt])
-// }
-// const deleteIng = (e)=>{
-//     e.stopPropagation()
-//     testRef.current = testRef.current.filter((el,idx)=>{
-//         return idx !== +e.target.id
-//     })
-//     // setIngredient(testRef.current)
-//     // console.log(testRef.current)
-    
-//     // let id = +e.target.id
-//     // let a = ingredient.copyWithin(id,id+1)
-//     // a.pop()
-//     setIngredient(ingredient.filter((_,id)=>{
-//         return id !== +e.target.id
-//     }))
-// }
-// let ingValue2 = []
-//         ingredient.forEach((_,id)=>{
-//             let ingValue = []
-//             keys.forEach(key =>{
-//                 if(key.includes(id)){
-//                     ingValue.push(recipeRef.current[key])
-//                 }
-//             })
-//             ingValue2.push(ingValue)
-//         })
-//         console.log(ingValue2)
-
-{/* <div className='ingredients'>
-                    <div>
-                        <label>
-                            재료:
-                            <input type={'text'} placeholder='재료이름' name={`ingredient0`} defaultValue={''}/>
-                            <input type={'text'} placeholder='재료 수량' name={`quantity0`} defaultValue={''}/>
-                            <input type={'text'} placeholder='단위(g/그램)' name={`unit0`} defaultValue={''}/>
-                        </label>
-                    </div>
-                    {ingredient.length>0 && ingredient.map((_,id)=>{
-                        return(
-                            <div key={id+1} id={`zz${id+1}`} ref={el=>testRef.current[id+1]=el}>
-                                <label>
-                                    재료:
-                                    <input type={'text'} placeholder='재료이름' name={`ingredient${id+1}`} defaultValue={''}/>
-                                    <input type={'text'} placeholder='재료 수량' name={`quantity${id+1}`} defaultValue={''}/>
-                                    <input type={'text'} placeholder='단위(g/그램)' name={`unit${id+1}`} defaultValue={''}/>
-                                </label>
-                                <div className='btn' onClick={deleteIng} id={id+1}>삭제</div>
-                            </div>
-                        )
-                    })}
-                    <div className='btn' onClick={addingredient}>재료 추가</div>
-                </div> */}
-function sleep(ms) {
-    const wakeUpTime = Date.now() + ms;
-    while (Date.now() < wakeUpTime) {}
-}
