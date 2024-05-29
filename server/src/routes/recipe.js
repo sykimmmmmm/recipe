@@ -32,19 +32,29 @@ const upload = multer({
     })
 })
 // 서버에 이미지 저장
-router.post('/upload', isAuth,upload.fields([{name:'recipeImage'},{name:'id'}]), expressAsyncHandler( async (req,res,next)=>{
+router.post('/upload', isAuth,upload.fields([{name:'recipeImage'},{name:'id'},{name:'finishedImgs'}]), expressAsyncHandler( async (req,res,next)=>{
     const recipeImages = req.files.recipeImage
+    const finishedImages = req.files.finishedImgs
     const orders = req.body.id
     const neworders = orders.filter(a=>a!=='undefined')
-    const images = await Promise.allSettled(recipeImages.map((file,id)=>{
-        const image = new Image({
+    const cookingImgs = await Promise.allSettled(recipeImages && recipeImages.map((file,id)=>{
+        const recipeImage = new Image({
             path: file.path.slice(7,file.path.length),
             order: neworders[id]
         })
-        const newImage = image.save()
-        return newImage
+        const newRecipeImage = recipeImage.save()
+        return newRecipeImage
     }))
-    res.json({code:200 , images})
+    const finishedImgs = await Promise.allSettled(finishedImages && finishedImages.map((file)=>{
+        const finishedImage = new Image({
+            path: file.path.slice(7,file.path.length)
+        })
+        const newFinishedImage = finishedImage.save()
+        return newFinishedImage
+    }))
+    console.log(req.files)
+    console.log(req.body.id)
+    res.json({code:200 , cookingImgs,finishedImgs})
 }))
 router.post('/add-recipe',isAuth,expressAsyncHandler( async (req,res,next)=>{
     const recipe = new Recipe({
@@ -59,7 +69,8 @@ router.post('/add-recipe',isAuth,expressAsyncHandler( async (req,res,next)=>{
         tag: req.body.tag,
         open: req.body.open,
         category: req.body.category,
-        cookingImgs: req.body.cookingImgs
+        cookingImgs: req.body.cookingImgs,
+        finishedImgs: req.body.finishedImgs
     })
     try{
         const newRecipe = await recipe.save()
@@ -73,6 +84,11 @@ router.post('/add-recipe',isAuth,expressAsyncHandler( async (req,res,next)=>{
 router.get('/recipe-list',expressAsyncHandler(async (req,res,next)=>{
     const recipe = await Recipe.find().populate('cookingImgs',['-_id','path','order']).populate('author','-_id').populate('finishedImgs','-_id').populate('rating','-_id')
     res.json({code:200, msg:'데이터를 불러왔습니다', recipe})
+}))
+
+router.get('/:id',expressAsyncHandler(async(req,res,next)=>{
+    const recipe = await Recipe.findOne({_id:req.params.id}).populate('cookingImgs',['-_id','path','order']).populate('author','-_id').populate('finishedImgs','-_id').populate('rating','-_id')
+    res.json({code:200,msg:'데이터불러오기 성공', recipe})
 }))
 
 module.exports = router

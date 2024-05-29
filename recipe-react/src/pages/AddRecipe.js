@@ -25,24 +25,41 @@ export default function AddRecipe(){
         inputRef.current=({...inputRef.current,[id]: (inputRef.current[id]?{...inputRef.current[id],[field]: value}:{[field]:value})})
     }
     // stepsForm 정보 저장
-    const stepsRef = useRef({0:{steps:'',file:'',id:''}})
+    const stepsRef = useRef({0:{steps:'',file:'',order:''}})
     // stepsForm 이미지 첨부시 프리뷰
     const [urlLink,setUrlLink] = useState()
     const [prevFile,setPrevFile] = useState({})
     const stepsInputChange = (id, field, value) => {
-        stepsRef.current=({...stepsRef.current,[id]: (stepsRef.current[id]?{...stepsRef.current[id],['id']:id,[field]: value}:{[field]:value})})
+        stepsRef.current=({...stepsRef.current,[id]: (stepsRef.current[id]?{...stepsRef.current[id],['order']:id,[field]: value}:{[field]:value})})
         const keys = Object.keys(stepsRef.current)
+        const file = stepsRef.current[id].file
         keys.map((key)=>{
             if(stepsRef.current[key].file === ''){
-                return stepsRef.current[key].id = undefined
-            }else return stepsRef.current[key].id = id
+                return stepsRef.current[key].order = undefined
+            }else return 
         })
         if(prevFile[id] !== stepsRef.current[id].file.name){
             setPrevFile({...prevFile,[id]:stepsRef.current[id].file.name})
-            setUrlLink({...urlLink,[id]:{src:URL.createObjectURL(stepsRef.current[id].file)}})
+            setUrlLink({...urlLink,[id]:{src: file ? URL.createObjectURL(file):''}})
         }
     }
-
+    console.log(prevFile[1])
+    console.log(stepsRef.current[1]?stepsRef.current[1].file.name:'z')
+    // finishedImgs 정보 저장
+    const finishedRef = useRef()
+    const [finishedImages,setFinishedImages] = useState([])
+    const imgs = [...finishedImages]
+    const previewImgs = ()=>{
+        const images = finishedRef.current.files
+        for(let i =0; i<images.length;i++){
+            imgs.push({file:images[i],url:URL.createObjectURL(images[i])})
+        }
+        setFinishedImages(imgs)
+    }
+    const openFile = (e)=>{
+        e.preventDefault()
+        finishedRef.current.click()
+    }
     //레시피 만들기 레시피데이터 저장
     const createRecipe = async(e)=>{
         e.stopPropagation()
@@ -59,6 +76,7 @@ export default function AddRecipe(){
             }
             ingredients.push(value)
         })
+        // 조리순서
         const stepsKey = Object.keys(stepsRef.current)
         const steps=[]
         stepsKey.forEach((key,id)=>{
@@ -80,27 +98,35 @@ export default function AddRecipe(){
         }
     } 
 
+
     // 레시피데이터가 저장되면 레시피 db로 저장
     useEffect(()=>{
         const recipeSave = async()=>{
             const token = JSON.parse(atob(sessionStorage.getItem('I')))
-            let imgs = []            
-            const fd = new FormData()
+            const cookingImgs = []            
+            const finishedImgs = []
+            const fd = new FormData()//이미지 서버저장
             for(let i in stepsRef.current){
                 fd.append('recipeImage',stepsRef.current[i].file)
-                fd.append('id',stepsRef.current[i].id)
+                fd.append('id',stepsRef.current[i].order)
             }
+            finishedImages.forEach(img=>{
+                fd.append('finishedImgs',img.file)
+            })
             await axios.post('recipes/upload',fd,{headers:{'Content-Type':'multipart/form-data','Authorization':`Bearer ${token}`}})
             .then(res => {
-                // console.log(res.data)
-                res.data.images.forEach(data=>{
-                    imgs.push(data.value)
+                console.log(res.data)
+                res.data.cookingImgs.forEach(data=>{
+                    cookingImgs.push(data.value)
+                })
+                res.data.finishedImgs.forEach(data=>{
+                    finishedImgs.push(data.value)
                 })
             })
             // console.log(imgs)
             const {recipeTitle,name,description,people,time,difficult,steps,type,situation,process,material,open,ingredients} = recipeData
             await axios.post('/recipes/add-recipe',{
-                recipeTitle,name,description,info:[people,time,difficult],ingredients,steps,category:[type,situation,process,material],open, cookingImgs:imgs
+                recipeTitle,name,description,info:[people,time,difficult],ingredients,steps,category:[type,situation,process,material],open,cookingImgs,finishedImgs
             },{headers:{Authorization:`Bearer ${token}`}})
             .then(res => {
                 const {message} = res.data
@@ -114,8 +140,7 @@ export default function AddRecipe(){
         if(validateValue(recipeData)){
             recipeSave()
         }
-    },[recipeData])
-
+    },[recipeData,stepsRef])
     return(
         <div className='wrapper'>
             <div className='addForm' onChange={inputRecipe}>
@@ -203,6 +228,19 @@ export default function AddRecipe(){
                 </div>
                 <IngredientForm changeHandler={handleInputChange}ref={inputRef}></IngredientForm>
                 <StepsForm changeHandler={stepsInputChange} ref={stepsRef} url={urlLink}/>
+                <div>
+                    <label>완성된 사진:
+                        {/* <div onClick={openFile}>파일선택</div> */}
+                        <input type={'file'} hidden accept={'image/*'} name={'finishedImgs'} onChange={previewImgs} ref={finishedRef} multiple ></input>
+                        <div style={{display:'flex'}} onClick={openFile}>파일선택
+                            {finishedImages.length>0 && finishedImages.map((image,id)=>{
+                                return(
+                                    <img key={id} src={image.url} style={{width:'300px',height:'300px'}}></img>
+                                )
+                            })}
+                        </div>
+                    </label>
+                </div>
             </div>
             <button name='save' onClick={createRecipe}>레시피 저장</button>
             <button name='upload' onClick={createRecipe}>레시피 공유</button>
