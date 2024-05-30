@@ -4,7 +4,6 @@ const StepsForm = forwardRef(({changeHandler,url},ref)=>{
     const [stepForm,setStepForm] = useState([])
     const [inputValue, setInputValue] = useState({})
     const [urlLink,setUrlLink] = useState()
-    
     const fileRef = useRef([])
     const addingredient = () =>{
         const newId = stepForm.length ? stepForm[stepForm.length-1].id + 1 : 1
@@ -37,27 +36,30 @@ const StepsForm = forwardRef(({changeHandler,url},ref)=>{
             return form
         }))
         setInputValue(values => {
-            // const newValues = { ...values }
-            const newValues = { ...ref.current }
+            let newValues = { ...ref.current }
             delete newValues[id]
             newValues[id] = {...newValues[id+1],['order']:id}
             const length = Object.values(newValues).length
             delete newValues[length-1]
             return newValues
         })
+
         const deleteRef = (data,id)=>{
             const newvalues = {...data}
-            delete newvalues[id]
-            newvalues[id] = {...newvalues[id+1],['order']:id}
             const keys = Object.keys(newvalues)
+            newvalues[id] = {...newvalues[id+1],['order']:id}
+            // delete newvalues[id+1]
             keys.forEach((key)=>{
-                if(key>id){
+                if(+key>id){
                     console.log(newvalues[key])
-                    newvalues[key] = {...newvalues[key+1]}
+                    newvalues[key] = {...newvalues[+key+1],['order']:+key}
+                }
+                if(+key===keys.length-1){   
+                    console.log('dd')
+                    delete newvalues[key]
                 }
                 console.log(newvalues[key])
             })
-            delete newvalues[keys.length-1]
             console.log(newvalues)
             return newvalues
         }
@@ -78,7 +80,7 @@ const StepsForm = forwardRef(({changeHandler,url},ref)=>{
                 onChange={(e)=> changeHandler(id,'steps',e.target.value)}/>
             </label>
             <input hidden type={'file'} name={`recipeImage${id}`} accept={'image/*'} onChange={(e)=> changeHandler(id,'file',e.target.files[0])} ref={el=>fileRef.current[id]=el}/>
-            <div id={id} onClick={(e)=>fileOpen(e,id)}>{urlLink&&urlLink[id] !== undefined ?<img src={urlLink[id].src} alt='이미지 없음' style={{width:'200px',height:'200px'}}/>:'이미지 첨부'}</div>
+            <div id={id} onClick={(e)=>fileOpen(e,id)}>{urlLink&&urlLink[id] !== undefined  && urlLink[id].src !=='' ?<img src={urlLink[id].src} alt='이미지 없음' style={{width:'200px',height:'200px'}}/>:'이미지 첨부'}</div>
             <button onClick={()=>pleaseDeleteMe(id)}>삭제</button>
         </div>
         )
@@ -96,7 +98,7 @@ const StepsForm = forwardRef(({changeHandler,url},ref)=>{
                     onChange={(e)=> changeHandler(0,'steps',e.target.value)} />
                 </label>
                 <input hidden type={'file'} accept={'image/*'} name='recipeImage0' onChange={(e)=> changeHandler(0,'file',e.target.files[0])} ref={el=>fileRef.current[0]=el}/>
-                <div onClick={(e)=>fileOpen(e,'0')}>{urlLink && urlLink[0] !==undefined ?<img src={urlLink[0].src} alt='이미지 없음' style={{width:'200px',height:'200px'}}/>:'이미지 첨부'}</div>
+                <div onClick={(e)=>fileOpen(e,'0')}>{urlLink && urlLink[0] !==undefined && urlLink[0].src !=='' ?<img src={urlLink[0].src} alt='이미지 없음' style={{width:'200px',height:'200px'}}/>:'이미지 첨부'}</div>
             </div>
             {stepForm.length>0 && stepForm.map((value)=>{
                 return <Steps id={value.id} key={value.id}/>

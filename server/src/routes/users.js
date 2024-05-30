@@ -24,7 +24,7 @@ router.post('/register',expressAsyncHandler(async(req,res,next)=>{
     }
 }))
 
-
+/* 로그인 */
 router.post('/login',expressAsyncHandler( async(req,res,next)=>{
     const loginUser = await User.findOne({
         userId: req.body.userId,

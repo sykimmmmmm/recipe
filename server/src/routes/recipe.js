@@ -56,6 +56,8 @@ router.post('/upload', isAuth,upload.fields([{name:'recipeImage'},{name:'id'},{n
     console.log(req.body.id)
     res.json({code:200 , cookingImgs,finishedImgs})
 }))
+
+/* 레시피저장 */
 router.post('/add-recipe',isAuth,expressAsyncHandler( async (req,res,next)=>{
     const recipe = new Recipe({
         recipeTitle: req.body.recipeTitle,
@@ -81,11 +83,26 @@ router.post('/add-recipe',isAuth,expressAsyncHandler( async (req,res,next)=>{
     }
 }))
 
+/* 상세보기 클릭시 조회수 증가 */
+router.post('/:id',expressAsyncHandler(async(req,res,next)=>{
+    const recipe = await Recipe.findOne({_id:req.params.id})
+    if(recipe){
+        recipe.viewership = recipe.viewership + 1
+        await recipe.save()
+        res.end()
+    }else{
+        res.status(404).json({code:404,message:'페이지를 찾을 수 없습니다'})
+    }
+
+}))
+
+/* 전체레시피 불러오기 */
 router.get('/recipe-list',expressAsyncHandler(async (req,res,next)=>{
     const recipe = await Recipe.find().populate('cookingImgs',['-_id','path','order']).populate('author','-_id').populate('finishedImgs','-_id').populate('rating','-_id')
     res.json({code:200, msg:'데이터를 불러왔습니다', recipe})
 }))
 
+/* 특정레시피 불러오기 */
 router.get('/:id',expressAsyncHandler(async(req,res,next)=>{
     const recipe = await Recipe.findOne({_id:req.params.id}).populate('cookingImgs',['-_id','path','order']).populate('author','-_id').populate('finishedImgs','-_id').populate('rating','-_id')
     res.json({code:200,msg:'데이터불러오기 성공', recipe})

@@ -36,15 +36,17 @@ export default function AddRecipe(){
         keys.map((key)=>{
             if(stepsRef.current[key].file === ''){
                 return stepsRef.current[key].order = undefined
-            }else return 
+            } 
+            return
         })
         if(prevFile[id] !== stepsRef.current[id].file.name){
             setPrevFile({...prevFile,[id]:stepsRef.current[id].file.name})
-            setUrlLink({...urlLink,[id]:{src: file ? URL.createObjectURL(file):''}})
+            setUrlLink({...urlLink,[id]:{src: file&&file!=='undefined' && URL.createObjectURL(file)}})
         }
     }
-    console.log(prevFile[1])
-    console.log(stepsRef.current[1]?stepsRef.current[1].file.name:'z')
+    console.log(urlLink)
+    // console.log(prevFile[1])
+    // console.log(stepsRef.current[1]?stepsRef.current[1].file.name:'z')
     // finishedImgs 정보 저장
     const finishedRef = useRef()
     const [finishedImages,setFinishedImages] = useState([])

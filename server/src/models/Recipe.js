@@ -36,14 +36,6 @@ const recipeSchema = new Schema({
     steps:{
         type: Mixed,
     },
-    tip: {
-        type:String,
-        trim:true
-    },
-    tag:{
-        type: String,
-        trim:true
-    },
     viewership:{
         type: Number,
         default:0
