@@ -3,35 +3,33 @@ import {Link} from 'react-router-dom'
 import axios from 'axios'
 import './styles/RecipeList.css'
 export default function RecipeList(){
-    const [recipeList,setRecipeList] = useState()
-
+    const [recipeList,setRecipeList] = useState([])
+    const [error,setError] = useState()
     const axiosData = async()=>{
-        const list = await axios.get('http://localhost:4000/recipes/recipe-list')
-        .then(res => res.data.recipe)
-        setRecipeList(list)
-    }
-    const viewershipIncrease= async(id)=>{
-        await axios.post(`http://localhost:4000/recipes/recipe-list/${id}`)
-        .then(res=> console.log(res.data))
+        await axios.get('http://localhost:4000/recipes/recipe-list')
+        .then(res =>setRecipeList(res.data.recipe))
+        .catch(err=>setError(err.response.data.message))
     }
 
     useEffect(()=>{
         axiosData()
     },[])
-    
+    console.log(recipeList)
+    console.log(error)
     return(
         <div className="recipe-wrap">
-            {recipeList && recipeList.map((data,id)=>{
+            {recipeList.length>0 && recipeList.map((data,id)=>{
                 const {author:{name:nickname},finishedImgs,recipeTitle,open,viewership,recommended}=data
-                if(open){
                     return(
-                        <Link to={`/recipe/${data._id}`} key={id} onClick={()=>viewershipIncrease(data._id)}>
+                        <Link to={`/recipe/${data.recipeId}`} key={id}>
                             <div className="recipe-box">
                                 <div className="imgBox">
-                                    <img src={`http://localhost:4000/${finishedImgs[0].path}`} alt=''/>
+                                   {finishedImgs.length>0 ? 
+                                   <img src={`http://localhost:4000/${finishedImgs[0].path}`} alt=''/>:
+                                   <img src={'/images/noImgs/no_image.gif'} alt=''/>} 
                                 </div>
                                 <div className="recipe-info">
-                                    <h4>{recipeTitle}</h4>
+                                    <p>{recipeTitle}</p>
                                     <p>{nickname}</p>
                                 </div>
                                 <div className="recipe-view">
@@ -40,9 +38,10 @@ export default function RecipeList(){
                                 </div>
                             </div>
                         </Link>
-                    )
-                }
-            })}
+                    )}
+                )
+            }
+            {error && <div>{error}</div>}
         </div>
     )
 }

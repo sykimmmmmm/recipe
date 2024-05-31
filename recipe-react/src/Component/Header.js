@@ -18,7 +18,7 @@ export default function Header(){
         <div className="header">
             <div className="header-logo">
                 <Link to={'/'}>
-                    <img src="" alt='myrecipe'></img>
+                    <img src="/images/logo/titleLogo.png" alt='myrecipe'></img>
                 </Link>
             </div>
             <div className='search'>

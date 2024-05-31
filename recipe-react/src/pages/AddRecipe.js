@@ -44,7 +44,7 @@ export default function AddRecipe(){
             setUrlLink({...urlLink,[id]:{src: file&&file!=='undefined' && URL.createObjectURL(file)}})
         }
     }
-    console.log(urlLink)
+    // console.log(urlLink)
     // console.log(prevFile[1])
     // console.log(stepsRef.current[1]?stepsRef.current[1].file.name:'z')
     // finishedImgs 정보 저장
@@ -105,6 +105,7 @@ export default function AddRecipe(){
     useEffect(()=>{
         const recipeSave = async()=>{
             const token = JSON.parse(atob(sessionStorage.getItem('I')))
+            let message = ''
             const cookingImgs = []            
             const finishedImgs = []
             const fd = new FormData()//이미지 서버저장
@@ -115,16 +116,25 @@ export default function AddRecipe(){
             finishedImages.forEach(img=>{
                 fd.append('finishedImgs',img.file)
             })
+            console.log(stepsRef.current[0])
             await axios.post('recipes/upload',fd,{headers:{'Content-Type':'multipart/form-data','Authorization':`Bearer ${token}`}})
             .then(res => {
-                console.log(res.data)
-                res.data.cookingImgs.forEach(data=>{
+                res.data.cookingImgs && res.data.cookingImgs.forEach(data=>{
                     cookingImgs.push(data.value)
                 })
-                res.data.finishedImgs.forEach(data=>{
+                res.data.finishedImgs && res.data.finishedImgs.forEach(data=>{
                     finishedImgs.push(data.value)
                 })
             })
+            .catch(e=>{
+                console.log(e)
+                message = e.response.data.message
+            })
+            if(message !== ''){
+                return alert(message)
+            }
+            console.log(cookingImgs)
+            console.log(finishedImgs)
             // console.log(imgs)
             const {recipeTitle,name,description,people,time,difficult,steps,type,situation,process,material,open,ingredients} = recipeData
             await axios.post('/recipes/add-recipe',{

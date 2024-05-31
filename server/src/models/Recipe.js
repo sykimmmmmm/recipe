@@ -65,6 +65,10 @@ const recipeSchema = new Schema({
     rating:{
         type:ObjectId,
         ref:'Review'
+    },
+    recipeId:{
+        type:Number,
+        default:1
     }
 })
 

@@ -26,7 +26,7 @@ export default function Login(){
             }
         })
         .catch(e=>{
-            alert(e)
+            alert(e.response.data.message)
         })
     }
 
