@@ -14,15 +14,16 @@ export default function Header(){
         axios.defaults.headers.common['Authorization'] = ``
         sessionStorage.removeItem('I')
     }
+    console.log(searchParams)
     return(
         <div className="header">
             <div className="header-logo">
-                <Link to={'/'}>
+                <Link to={'/'} replace={true}>
                     <img src="/images/logo/titleLogo.png" alt='myrecipe'></img>
                 </Link>
             </div>
             <div className='search'>
-                <input type='text' name='q' placeholder="검색어를 입력하세요" ref={queryString}/>
+                <input type='text' name='name' placeholder="검색어를 입력하세요" ref={queryString}/>
                 <button onClick={searchQuery}>검색</button>
             </div>
             <div>

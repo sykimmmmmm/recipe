@@ -155,6 +155,7 @@ export default function AddRecipe(){
     },[recipeData,stepsRef])
     return(
         <div className='wrapper'>
+            <h2>레시피 등록</h2>
             <div className='addForm' onChange={inputRecipe}>
                 <div className="basicInfo">
                     <label>

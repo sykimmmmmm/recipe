@@ -1,4 +1,4 @@
-import { Route, Routes, useLocation } from 'react-router-dom';
+import { Navigate, Route, Routes, useLocation } from 'react-router-dom';
 import Header from './Component/Header';
 import {Home, NotFound, Register, Mypage, AddRecipe, Recipe, Login} from './pages/index'
 import axios from 'axios'

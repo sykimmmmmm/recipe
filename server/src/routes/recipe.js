@@ -98,28 +98,47 @@ router.post('/add-recipe',isAuth,expressAsyncHandler( async (req,res,next)=>{
 }))
 
 
-
 /* 전체레시피 불러오기 */
 router.get('/recipe-list',expressAsyncHandler(async (req,res,next)=>{
-    const recipe = await Recipe.find({open:true}).populate('cookingImgs',['-_id','path','order']).populate('author','-_id').populate('finishedImgs','-_id').populate('rating','-_id')
-    if(recipe.length>0){
-        console.log(recipe)
-        res.json({code:200, message:'데이터를 불러왔습니다', recipe})
+    let recipe = Recipe.find({open:true})
+    let {type, situation, process, material,name} = req.query
+    console.log(type,situation,process,material,name)
+    if(name !== undefined){
+        console.log(name)
+        recipe = recipe.find({name:{$regex:`${name}`}})
+    }
+    if(type !== undefined && req.query.type !== '전체'){
+        console.log(req.query.type)
+        recipe = recipe.find({category:{$in:[type]}})
+    }
+    if(situation !== undefined && req.query.situation !== '전체'){
+        console.log(req.query.situation)
+        recipe = recipe.find({category:{$in:[situation]}})
+    }
+    if(process !== undefined  && req.query.process !== '전체'){
+        recipe = recipe.find({category:{$in:[process]}})
+    }
+    if(material !== undefined && req.query.material !== '전체'){
+        recipe = recipe.find({category:{$in:[material]}})
+    }
+    if(recipe){
+        res.send(await recipe.populate('cookingImgs',['-_id','path','order']).populate('author','-_id').populate('finishedImgs','-_id').populate('rating','-_id').exec())
     }else{
-        res.status(404).json({code:404,message:'공유된 레시피가 없습니다'})
+        res.json({code:404,message:'공개된 레시피가 없습니다'})
     }
 }))
 
 /* 상세보기 클릭시 특정레시피 조회 및 조회수 증가 */
 router.get('/:id',expressAsyncHandler(async(req,res,next)=>{
-    const recipe = await Recipe.findOne({recipeId:req.params.id}).populate('cookingImgs',['-_id','path','order']).populate('author','-_id').populate('finishedImgs','-_id').populate('rating','-_id')
-    if(recipe){
-        recipe.viewership = recipe.viewership + 1
-        await recipe.save()
-        res.json({code:200, msg:'데이터를 불러왔습니다', recipe})
-    }else{
-        res.status(404).json({code:404,message:'페이지를 찾을 수 없습니다'})
-    }
+    
+        const recipe = await Recipe.findOne({recipeId:req.params.id}).populate('cookingImgs',['-_id','path','order']).populate('author','-_id').populate('finishedImgs','-_id').populate('rating','-_id')
+        if(recipe){
+            recipe.viewership = recipe.viewership + 1
+            await recipe.save()
+            res.json({code:200, msg:'데이터를 불러왔습니다', recipe})
+        }else{
+            res.status(404).json({code:404,message:'페이지를 찾을 수 없습니다'})
+        }
 }))
 
 module.exports = router

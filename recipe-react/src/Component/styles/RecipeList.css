@@ -1,10 +1,11 @@
 .recipe-wrap{
     box-sizing: border-box;
-    padding: 1rem 4rem;
+    border: 1px solid green;
+    padding: 1rem 10rem;
     display: grid;
-    grid-template-columns: repeat(4,1fr);
+    grid-template-columns: repeat(4,300px);
     grid-auto-rows: auto;
-    gap: 40px;
+    gap: 50px;
 }
 .recipe-box{
     box-sizing: border-box;
@@ -31,4 +32,37 @@
 .recipe-box .recipe-info *{
     margin: 0;
     padding: 0;
+}
+
+.category{
+    box-sizing: border-box;
+    padding: 1rem 10rem;
+    width: 100%;
+    border: 1px solid blue;
+}
+.category > div{
+    margin-bottom: 5px;
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+.category >div span{
+    padding-right: 10px;
+    border-right: 3px solid #ddb485;
+    color: #ddb485;
+}
+.category > div >div{
+    width: 50px;
+}
+.category > div label{
+    cursor: pointer;
+    padding: 5px 10px;
+}
+.category > div label:hover{
+    color: #ddb485;
+}
+.category > div label:has(input[type='radio']:checked) {
+    color: #fff;
+    background-color: #ddb485;
+    border-radius: 10px;
 }

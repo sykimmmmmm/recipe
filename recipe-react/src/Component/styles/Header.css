@@ -2,7 +2,7 @@
     box-sizing: border-box;
     width: 100%;
     height: 100px;
-    padding: 10px 20px;
+    padding: 10px 10rem;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -10,8 +10,8 @@
     top: 0;
     left: 0;
     right: 0;
-    background-color: #d9c8b5;
-    border-bottom: 2px solid #d9c8b5;
+    background-color: #cc985d;
+    border-bottom: 2px solid #ddb485;
     box-shadow: 1px 1px 1px rgba(0, 0, 0, .6);
     z-index: 100;
 }

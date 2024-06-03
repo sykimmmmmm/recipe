@@ -9,14 +9,14 @@ export default function Recipe(){
         const id = location.pathname.slice(8,location.pathname.length)
         const viewership = await axios.get(`http://localhost:4000/recipes/${id}`)
         .then(res => res.data.recipe)
-        console.log(viewership)     
+        .catch(e=>console.log(e.response))
         setRecipeData(viewership)
     }
     useEffect(()=>{
         axiosData()
     },[])
     if(recipeData){
-        const {author:{name:nickname},category,createdAt,finishedImgs,description,info,recipeTitle,ingredients,lastModifiedAt,name,viewership,wishlisted,recommended}=recipeData
+        const {author:{name:nickname},category,finishedImgs,description,info,recipeTitle,ingredients,name,viewership,wishlisted,recommended}=recipeData
         const steps = recipeData.steps
         const cookingImgs = recipeData.cookingImgs
         return(
@@ -24,7 +24,7 @@ export default function Recipe(){
                 <div className='recipe-header'>
                     <div className="recipe-thumbnailBox">
                         {finishedImgs.map((img,id)=>{
-                            return(<div class="recipe-thumbnail"><img src={`http://localhost:4000/${img.path}`} alt='' key={id}/></div>)
+                            return(<div key={id} className="recipe-thumbnail"><img src={`http://localhost:4000/${img.path}`} alt='' key={id}/></div>)
                         })}
                     </div>
                     <div className="recipe-info">
@@ -52,6 +52,8 @@ export default function Recipe(){
                             {cookingImgs.map((image,idx2)=>{
                                 if(image.order === i){
                                     return <img key={idx2} src={`http://localhost:4000/${image.path}`} style={{width:'300px',height:'300px'}} alt=''></img>
+                                }else{
+                                    return false
                                 }
                             })}
                         </div>
