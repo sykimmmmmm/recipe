@@ -37,7 +37,7 @@ router.post('/upload', isAuth,upload.fields([{name:'recipeImage'},{name:'id'},{n
     const finishedImages = req.files.finishedImgs
     const orders = req.body.id
     if(req.fileValidationError){
-        res.status(400).json({code:400,message:req.fileValidationError})
+        res.json({code:400,message:req.fileValidationError})
     }else{
         const neworders = (orders.length>1 && orders.filter(a=>a!=='undefined')) || orders
         const cookingImgs = await Promise.allSettled(recipeImages && recipeImages.map((file,id)=>{
@@ -100,29 +100,31 @@ router.post('/add-recipe',isAuth,expressAsyncHandler( async (req,res,next)=>{
 
 /* 전체레시피 불러오기 */
 router.get('/recipe-list',expressAsyncHandler(async (req,res,next)=>{
-    let recipe = Recipe.find({open:true})
+    let recipe = await Recipe.find({open:true}).populate('cookingImgs',['-_id','path','order']).populate('author','-_id').populate('finishedImgs','-_id').populate('rating','-_id')
     let {type, situation, process, material,name} = req.query
     console.log(type,situation,process,material,name)
+    /* query 조건부 필터링 */
     if(name !== undefined){
-        console.log(name)
-        recipe = recipe.find({name:{$regex:`${name}`}})
+        recipe = recipe.filter(recipe=> recipe.name.includes(name))
     }
+
     if(type !== undefined && req.query.type !== '전체'){
-        console.log(req.query.type)
-        recipe = recipe.find({category:{$in:[type]}})
+        recipe = recipe.filter(recipe => recipe.category.includes(type))
     }
+    
     if(situation !== undefined && req.query.situation !== '전체'){
-        console.log(req.query.situation)
-        recipe = recipe.find({category:{$in:[situation]}})
+        recipe = recipe.filter(recipe => recipe.category.includes(situation))
     }
+
     if(process !== undefined  && req.query.process !== '전체'){
-        recipe = recipe.find({category:{$in:[process]}})
+        recipe = recipe.filter(recipe => recipe.category.includes(process))
     }
+
     if(material !== undefined && req.query.material !== '전체'){
-        recipe = recipe.find({category:{$in:[material]}})
+        recipe = recipe.filter(recipe => recipe.category.includes(material))
     }
-    if(recipe){
-        res.send(await recipe.populate('cookingImgs',['-_id','path','order']).populate('author','-_id').populate('finishedImgs','-_id').populate('rating','-_id').exec())
+    if(recipe.length>0){
+        res.send(recipe)
     }else{
         res.json({code:404,message:'공개된 레시피가 없습니다'})
     }
@@ -137,7 +139,7 @@ router.get('/:id',expressAsyncHandler(async(req,res,next)=>{
             await recipe.save()
             res.json({code:200, msg:'데이터를 불러왔습니다', recipe})
         }else{
-            res.status(404).json({code:404,message:'페이지를 찾을 수 없습니다'})
+            res.json({code:404,message:'페이지를 찾을 수 없습니다'})
         }
 }))
 

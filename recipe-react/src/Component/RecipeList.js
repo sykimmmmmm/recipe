@@ -13,7 +13,9 @@ export default function RecipeList(){
                 setRecipeList(res.data)
             })
             .catch(err=>{
-                setRecipeList(err)
+                console.warn = console.err=()=>{}
+                console.log(err.response.data.message)
+                setRecipeList(err.response.data)
             })
         }else{
             await axios.get('http://localhost:4000/recipes/recipe-list')
@@ -27,6 +29,7 @@ export default function RecipeList(){
     }
     useEffect(()=>{
         axiosData(filter)
+        console.warn = console.error=()=>{}
 
     },[filter])
     return(
@@ -56,7 +59,7 @@ export default function RecipeList(){
                         )}
                         )
                     }
-                {recipeList.length===0 && <div>공개중인 레시피가 없습니다</div>}
+                {recipeList.code===404 && <div>공개중인 레시피가 없습니다</div>}
             </div>
         </>
     )

@@ -1,74 +1,84 @@
-import React, { useState, useRef, useEffect } from "react";
-import { Link, redirect, useNavigate } from "react-router-dom";
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import './styles/Register.css';
+import axios from 'axios';
 
 export default function Register(){
     const navigation = useNavigate()
     const [loginData,setLoginData] = useState({})
-    const [registerData,setRegisterData] = useState()
     const fetchRegister = async(data)=>{
         const {email,name,userId,password,confirmPassword} = data
-        const register = await fetch('http://localhost:4000/users/register',{
-            headers:{
-                'Content-Type':'application/json'
-            },
-            method:'POST',
-            body:JSON.stringify({email,name,userId,password,confirmPassword})
-        }).then(res => res.json())
-        alert(register.msg)
-        if(register.code===200){
-            return navigation("/")
-        }else if(register.code === 400){
-            return navigation("/user/login")
+        if(email && name && userId && password && confirmPassword && password === confirmPassword){
+            const register = await axios.post('http://localhost:4000/users/register',{email,name,userId,password,confirmPassword})
+            .then(res => res.data)
+            .catch(err=> err.response.data)
+            alert(register.msg)
+            if(register.code===200){
+                return navigation("/")
+            }else if(register.code === 409){
+                return navigation("/user/login")
+            }
+        }else{
+            alert('필요한 정보가 없습니다')
         }
-        return setRegisterData(register)
     }
 
     const register = async ()=>{
         await fetchRegister(loginData)
+        let {email,name,userId,password,confirmPassword} = loginData
+        if(!name){
+            const box = document.querySelector('.nickName')
+            const div = document.createElement('div')
+            div.innerText = '닉네임을 입력해주세요'
+            box.append(div)
+        }
     }
 
     const loginInfo = (e)=>{
         const {name,value} = e.target
         setLoginData({...loginData,[name]:value})
     }
-    useEffect(()=>{
-        console.log(registerData)
-        if(registerData && registerData.code=== 200){
-            return ()=>{redirect('/',200)}
-        }else if(registerData && registerData.code === 400){
-            console.log('aa')
-            redirect('/user/login',400)
-            return ()=>{redirect('/user/login',400)}
-        }
-    },[registerData])
-    // console.log(registerData)
+
     return(
-        <>
-        <div>
+        <div className="register-wrapper">
+            <div>
+                <h3>회원가입</h3>
+            </div>
             <form className="loginForm">
-                <label>
-                닉네임:
-                    <input type="text" name="name" placeholder="닉네임 입력하세요" onChange={loginInfo}></input>
-                </label>
-                <label>
-                이메일:
-                    <input type="text" name="email" placeholder="email 입력하세요" onChange={loginInfo}></input>
-                </label>
-                <label>
-                아이디:
-                    <input type="text" name="userId" placeholder="아이디 입력하세요" onChange={loginInfo}></input>
-                </label>
-                <label>
-                비밀번호:
-                    <input type="password" name="password" placeholder="패스워드 입력하세요" onChange={loginInfo}></input>
-                </label>
-                <label>
-                비밀번호 확인:
-                    <input type="password" name="confirmPassword" placeholder="패스워드 입력하세요" onChange={loginInfo}></input>
-                </label>
+                <div className="nickName">
+                    <label>
+                        닉네임
+                        <input type="text" name="name" placeholder="닉네임을 입력하세요..." onChange={loginInfo} required></input>
+                    </label>
+                </div>
+                <div className="email">
+                    <label>
+                        이메일
+                        <input type="text" name="email" placeholder="이메일을 입력하세요..." onChange={loginInfo} required></input>
+                    </label>
+                </div>
+                <div className="userId">
+                    <label>
+                        아이디
+                        <input type="text" name="userId" placeholder="아이디를 입력하세요(6~20자)" onChange={loginInfo} required></input>
+                    </label>
+                </div>
+                <div className="password">
+                    <label>
+                        비밀번호
+                        <input type="password" name="password" placeholder="패스워드를 입력하세요(문자,숫자,특수문자 포함 8~20자)" onChange={loginInfo} required></input>
+                    </label>
+                </div>
+                <div className='confirmPassword'>
+                    <label>
+                        비밀번호 확인
+                        <input type="password" name="confirmPassword" placeholder="패스워드를 다시 입력해주세요..." onChange={loginInfo} required></input>
+                    </label>
+                </div>
             </form>
-            <button onClick={register}>회원가입</button>
+            <div className="register-btn">
+                <button onClick={register}>회원가입</button>
+            </div>
         </div>
-        </>
     )
 }

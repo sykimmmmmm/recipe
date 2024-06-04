@@ -22,8 +22,7 @@ const userSchema = new Schema({
     },
     email:{
         type:String,
-        required: true,
-        unique:true
+        required: true
     },
     recipes:[{type:ObjectId,ref:'Recipe'}],
     comments:[{type:ObjectId, ref:'Comment'}],

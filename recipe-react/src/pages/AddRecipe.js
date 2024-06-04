@@ -39,7 +39,7 @@ export default function AddRecipe(){
             } 
             return
         })
-        if(prevFile[id] !== stepsRef.current[id].file.name){
+        if(stepsRef.current[id].file && prevFile[id] !== stepsRef.current[id].file.name){
             setPrevFile({...prevFile,[id]:stepsRef.current[id].file.name})
             setUrlLink({...urlLink,[id]:{src: file&&file!=='undefined' && URL.createObjectURL(file)}})
         }
@@ -133,8 +133,6 @@ export default function AddRecipe(){
             if(message !== ''){
                 return alert(message)
             }
-            console.log(cookingImgs)
-            console.log(finishedImgs)
             // console.log(imgs)
             const {recipeTitle,name,description,people,time,difficult,steps,type,situation,process,material,open,ingredients} = recipeData
             await axios.post('/recipes/add-recipe',{
@@ -153,6 +151,7 @@ export default function AddRecipe(){
             recipeSave()
         }
     },[recipeData,stepsRef])
+
     return(
         <div className='wrapper'>
             <h2>레시피 등록</h2>

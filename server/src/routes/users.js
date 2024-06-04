@@ -10,7 +10,7 @@ const router = express.Router()
 router.post('/register',expressAsyncHandler(async(req,res,next)=>{
     const user = await User.findOne({$or:[{email:req.body.email},{userId:req.body.userId}]})
     if(user){
-        res.status(400).json({code:400,msg:'이미 있는 사용자입니다'})
+        res.status(409).json({code:409,msg:'이미 있는 사용자입니다'})
     }else{
         await Counter.findOne({name:'counter'}).exec()
         .then(counter=> {
@@ -20,15 +20,17 @@ router.post('/register',expressAsyncHandler(async(req,res,next)=>{
                 email: req.body.email,
                 userId: req.body.userId,
                 password: req.body.password,
-                confirmPassword: req.body.confirmPassword,
                 order:count    
             }).save()
-            .catch(e=>res.status(400).json({code:400, msg:'이미 있는 사용자입니다'}))
+            .catch(e=>res.status(400).json({code:400, msg:'정보가 없습니다'}))
             .then((user)=>{
                 Counter.updateOne({name:'counter'},{$inc:{userId:1}})
                 .then(()=>{
                     res.json({code:200,msg:'회원님의 가입을 환영합니다',user})
                 })
+                // .catch((e)=>{
+                //     res.status(400).json({code:400,msg:'정보가 없습니다'})
+                // })
             })
         })
     }
