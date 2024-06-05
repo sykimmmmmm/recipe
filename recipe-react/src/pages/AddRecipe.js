@@ -170,92 +170,103 @@ export default function AddRecipe(){
                         <textarea maxLength={100} cols={50} rows={3} type={'text'} placeholder='간단한 요리설명을 입력하세요' name='description' defaultValue={''}/>
                     </label>
                     <div>
-                        요리정보:
-                        <label>
-                            인원
-                            <select defaultValue={''} name='people' >
-                                <option value=''>인원</option>
-                                {people.map((p,id)=>{
-                                    return <option key={id} value={p}>{p}</option>
-                                })}
-                            </select>
-                        </label>
-                        <label>
-                            시간
-                            <select defaultValue={''} name='time'>
-                                <option value=''>시간</option>
-                                {time.map((t,id)=>{
-                                    return <option key={id} value={t}>{t}</option>
-                                })}
-                            </select>
-                        </label>
-                        <label>
-                             난이도
-                            <select defaultValue={''} name='difficult'>
-                                <option value={''}>난이도</option>
-                                {difficult.map((diff,id)=>{
-                                    return <option key={id} value={diff}>{diff}</option>
-                                })}
-                            </select>
-                        </label>
+                        요리정보
+                        <div>
+                            <label>
+                                인원
+                                <select defaultValue={''} name='people' >
+                                    <option value=''>인원</option>
+                                    {people.map((p,id)=>{
+                                        return <option key={id} value={p}>{p}</option>
+                                    })}
+                                </select>
+                            </label>
+                            <label>
+                                시간
+                                <select defaultValue={''} name='time'>
+                                    <option value=''>시간</option>
+                                    {time.map((t,id)=>{
+                                        return <option key={id} value={t}>{t}</option>
+                                    })}
+                                </select>
+                            </label>
+                            <label>
+                                 난이도
+                                <select defaultValue={''} name='difficult'>
+                                    <option value={''}>난이도</option>
+                                    {difficult.map((diff,id)=>{
+                                        return <option key={id} value={diff}>{diff}</option>
+                                    })}
+                                </select>
+                            </label>
+                        </div>
+                        <div>
+                            <label>
+                                종류별:
+                                <select defaultValue={''} name='type'>
+                                    <option value={''}>종류별</option>
+                                    {type.map((ty,id)=>{
+                                        return <option value={ty} key={id}>{ty}</option>
+                                    })}
+                                </select>    
+                            </label>    
+                            <label>
+                                상황별:
+                                <select defaultValue={''} name='situation'>
+                                    <option value={''}>상황별</option>   
+                                    {situation.map((sit,id)=>{
+                                        return <option value={sit} key={id}>{sit}</option>
+                                    })}
+                                </select>    
+                            </label>    
+                            <label>
+                                방법별:
+                                <select defaultValue={''} name='process'>
+                                    <option value={''}>방법별</option>   
+                                    {process.map((pro,id)=>{
+                                        return <option value={pro} key={id}>{pro}</option>
+                                    })}
+                                </select>    
+                            </label>    
+                            <label>
+                                재료별:
+                                <select defaultValue={''} name='material'>
+                                    <option value={''}>재료별</option>   
+                                    {material.map((mat,id)=>{
+                                        return <option value={mat} key={id}>{mat}</option>
+                                    })}
+                                </select>    
+                            </label>    
+                        </div>  
                     </div>
-                    <div>
-                        <label>
-                            종류별:
-                            <select defaultValue={''} name='type'>
-                                <option value={''}>종류별</option>
-                                {type.map((ty,id)=>{
-                                    return <option value={ty} key={id}>{ty}</option>
-                                })}
-                            </select>    
-                        </label>    
-                        <label>
-                            상황별:
-                            <select defaultValue={''} name='situation'>
-                                <option value={''}>상황별</option>   
-                                {situation.map((sit,id)=>{
-                                    return <option value={sit} key={id}>{sit}</option>
-                                })}
-                            </select>    
-                        </label>    
-                        <label>
-                            방법별:
-                            <select defaultValue={''} name='process'>
-                                <option value={''}>방법별</option>   
-                                {process.map((pro,id)=>{
-                                    return <option value={pro} key={id}>{pro}</option>
-                                })}
-                            </select>    
-                        </label>    
-                        <label>
-                            재료별:
-                            <select defaultValue={''} name='material'>
-                                <option value={''}>재료별</option>   
-                                {material.map((mat,id)=>{
-                                    return <option value={mat} key={id}>{mat}</option>
-                                })}
-                            </select>    
-                        </label>    
-                    </div>  
                 </div>
                 <IngredientForm changeHandler={handleInputChange}ref={inputRef}></IngredientForm>
                 <StepsForm changeHandler={stepsInputChange} ref={stepsRef} url={urlLink}/>
-                <div>
-                    <label>완성된 사진:
-                        {/* <div onClick={openFile}>파일선택</div> */}
+                <div className='finishedImgs'>
+                    <label>완성된 사진 추가
                         <input type={'file'} hidden accept={'image/*'} name={'finishedImgs'} onChange={previewImgs} ref={finishedRef} multiple ></input>
-                        <div style={{display:'flex'}} onClick={openFile}>파일선택
-                            {finishedImages.length>0 && finishedImages.map((image,id)=>{
-                                return(
-                                    <img key={id} src={image.url} style={{width:'300px',height:'300px'}}></img>
-                                )
-                            })}
+                        <div onClick={openFile}>
+                            {finishedImages.length>0 ? 
+                                <>
+                                    {finishedImages.map((image,id)=>{
+                                        return(
+                                            <img key={id} src={image.url}></img>
+                                        )
+                                    })}
+                                    <img src='./images/etc/addImage.png' alt='+'/>
+                                </>
+                                :
+                            <div>
+                                <img src='./images/etc/addImage.png' alt='사진을 추가해주세요'/>
+                            </div>}
                         </div>
                     </label>
                 </div>
             </div>
-            <button name='save' onClick={createRecipe}>레시피 저장</button>
-            <button name='upload' onClick={createRecipe}>레시피 공유</button>
+            <div className="control-btns">
+                <button name='save' onClick={createRecipe}>레시피 저장</button>
+                <button name='upload' onClick={createRecipe}>레시피 공유</button>
+            </div>
         </div>
     )
 }

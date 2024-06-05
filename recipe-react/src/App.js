@@ -9,8 +9,8 @@ function App() {
   axios.defaults.withCredentials=true
   return (
     <>
+      {/* {location.pathname !== '/recipe/review' ? <Header/>: ''} */}
       <Header/>
-      {/* {location.pathname !== '/user/register' ? <Header/>: ''} */}
       <Routes>
         <Route path='/' element={<Home/>}/>
         <Route path='/user/register' element={<Register/>}/>

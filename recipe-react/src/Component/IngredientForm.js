@@ -77,7 +77,7 @@ const IngredientForm = forwardRef(({changeHandler},ref)=>{
             {ingredientForm.length>0 && ingredientForm.map((value)=>{
                 return <Addingredient id={value.id} key={value.id}/>
             })}
-            <div className='btn' onClick={addingredient}>재료 추가</div>
+            <button className='btn' onClick={addingredient}>재료 추가</button>
         </div>
     )
 

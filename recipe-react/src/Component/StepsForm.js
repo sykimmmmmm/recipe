@@ -74,14 +74,16 @@ const StepsForm = forwardRef(({changeHandler,url},ref)=>{
     const Steps = ({id}) =>{
         return (
         <div>
-            <label >
-            스텝:
-                <textarea cols={50} rows={5} type={'text'} placeholder='조리법을 입력하세요' name={`steps${id}`} defaultValue={ref.current[id]?ref.current[id].steps:''}
-                onChange={(e)=> changeHandler(id,'steps',e.target.value)}/>
-            </label>
-            <input hidden type={'file'} name={`recipeImage${id}`} accept={'image/*'} onChange={(e)=> changeHandler(id,'file',e.target.files[0])} ref={el=>fileRef.current[id]=el}/>
-            <div id={id} onClick={(e)=>fileOpen(e,id)}>{urlLink&&urlLink[id] !== undefined  && urlLink[id].src !=='' ?<img src={urlLink[id].src} alt='이미지 없음' style={{width:'200px',height:'200px'}}/>:'이미지 첨부'}</div>
-            <button onClick={()=>pleaseDeleteMe(id)}>삭제</button>
+            <h4>스텝{id+1}</h4>
+            <div>
+                <label >
+                    <textarea cols={50} rows={8} type={'text'} placeholder='조리법을 입력하세요' name={`steps${id}`} defaultValue={ref.current[id]?ref.current[id].steps:''}
+                    onChange={(e)=> changeHandler(id,'steps',e.target.value)}/>
+                </label>
+                <input hidden type={'file'} name={`recipeImage${id}`} accept={'image/*'} onChange={(e)=> changeHandler(id,'file',e.target.files[0])} ref={el=>fileRef.current[id]=el}/>
+                <div id={id} onClick={(e)=>fileOpen(e,id)}>{urlLink&&urlLink[id] !== undefined  && urlLink[id].src !=='' ?<img src={urlLink[id].src} alt='이미지 없음' style={{width:'200px',height:'200px'}}/>:<img src="./images/etc/addImage.png" alt="이미지추가"/>}</div>
+                <button onClick={()=>pleaseDeleteMe(id)}>삭제</button>
+            </div>
         </div>
         )
     }
@@ -92,18 +94,20 @@ const StepsForm = forwardRef(({changeHandler,url},ref)=>{
     return(
         <div className='steps'>
             <div>
-                <label>
-                    스텝:
-                    <textarea cols={50} rows={5} type={'text'} placeholder='조리법을 입력하세요' name={`steps0`} defaultValue={ref.current[0]?ref.current[0].steps:''}
-                    onChange={(e)=> changeHandler(0,'steps',e.target.value)} />
-                </label>
-                <input hidden type={'file'} accept={'image/*'} name='recipeImage0' onChange={(e)=> changeHandler(0,'file',e.target.files[0])} ref={el=>fileRef.current[0]=el}/>
-                <div onClick={(e)=>fileOpen(e,'0')}>{urlLink && urlLink[0] !==undefined && urlLink[0].src !=='' ?<img src={urlLink[0].src} alt='이미지 없음' style={{width:'200px',height:'200px'}}/>:'이미지 첨부'}</div>
+                <h4>스텝1</h4>
+                <div>
+                    <label>
+                        <textarea cols={50} rows={8} type={'text'} placeholder='조리법을 입력하세요' name={`steps0`} defaultValue={ref.current[0]?ref.current[0].steps:''}
+                        onChange={(e)=> changeHandler(0,'steps',e.target.value)} />
+                    </label>
+                    <input hidden type={'file'} accept={'image/*'} name='recipeImage0' onChange={(e)=> changeHandler(0,'file',e.target.files[0])} ref={el=>fileRef.current[0]=el}/>
+                    <div onClick={(e)=>fileOpen(e,'0')}>{urlLink && urlLink[0] !==undefined && urlLink[0].src !=='' ?<img src={urlLink[0].src} alt='이미지 없음' style={{width:'200px',height:'200px'}}/>:<img src="./images/etc/addImage.png" alt="이미지추가"/>}</div>
+                </div>
             </div>
             {stepForm.length>0 && stepForm.map((value)=>{
                 return <Steps id={value.id} key={value.id}/>
             })}
-            <div className='btn' onClick={addingredient}>재료 추가</div>
+            <button className='btn' onClick={addingredient}>순서 추가</button>
         </div>
     )
 
