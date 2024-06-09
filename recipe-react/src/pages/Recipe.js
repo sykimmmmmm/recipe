@@ -2,37 +2,58 @@ import React, { useEffect, useState } from "react";
 import axios from 'axios'
 import { useLocation } from "react-router-dom";
 import { MdAutoGraph } from "react-icons/md";
-import { IoPeople, IoTime } from "react-icons/io5";
+import { IoPeople, IoTime, IoThumbsUpSharp } from "react-icons/io5";
+import { FaStar } from "react-icons/fa6";
 import './styles/Recipe.css'
 import Review from "../Component/Review";
 export default function Recipe(){
     const [recipeData,setRecipeData] = useState()
+    const [reviewData,setReviewData] = useState(null)
     const [modalOn,setModalOn] = useState(false)
+    const [success,setSuccess] = useState(null)
     const location = useLocation()
+    const id = location.pathname.slice(8,location.pathname.length)
     const axiosData = async()=>{
         const id = location.pathname.slice(8,location.pathname.length)
         const viewership = await axios.get(`http://localhost:4000/recipes/${id}`)
-        .then(res => res.data.recipe)
+        .then(res => {
+            setReviewData(res.data.review)
+            return res.data.recipe})
         .catch(e=>console.log(e.response))
         setRecipeData(viewership)
     }
     const reviewPopup =()=>{
-        setModalOn(!modalOn)
+        setModalOn(true)
+    }
+    const increaseRecommend = async()=>{
+        const id = location.pathname.slice(8,location.pathname.length)
+        const token = JSON.parse(atob(sessionStorage.getItem('I')))
+        if(+localStorage.getItem(`recipe${id}rc`) === -1){
+            localStorage.setItem(`recipe${id}rc`,1)
+            axios.post('recipes/recommend',{num:1,id:id},{headers:{Authorization:`Bearer ${token}`}})
+            .then(res=>setSuccess(res.data.success))
+        }else{
+            localStorage.setItem(`recipe${id}rc`,-1)
+            axios.post('recipes/recommend',{num:-1,id:id},{headers:{Authorization:`Bearer ${token}`}})
+            .then(res=>setSuccess(res.data.success))
+        }
     }
     useEffect(()=>{
         axiosData()
     },[])
+    
     if(recipeData){
         const {author:{name:nickname},finishedImgs,description,info,recipeTitle,ingredients}=recipeData
         const steps = recipeData.steps
         const cookingImgs = recipeData.cookingImgs
         return(
             <>
-                <div class="body">
+                <div className="body">
                     <div className="recipe-wrapper">
                         <section className='recipe-header'>
                             {sessionStorage.getItem('I')&&<div className="recipe-review" onClick={reviewPopup}>리뷰 쓰기</div>}
                             <div className="recipe-thumbnailBox">
+                                {sessionStorage.getItem('I') && <div className="recipe-recommend"><IoThumbsUpSharp fill={ +localStorage.getItem(`recipe${id}rc`) === 1 ?'blue' : 'white'} onClick={increaseRecommend}/></div>}
                                 <img src={`http://localhost:4000/${finishedImgs[0].path}`} alt=''/>
                             </div>
                             <div className="recipe-desc">
@@ -99,11 +120,39 @@ export default function Recipe(){
                             </div>
                         </section>
                         <section className="recipe-review">
+                            {reviewData && <h3>리뷰({reviewData.length})</h3>}
+                            {reviewData && reviewData.map((review,id)=>{
+                                let {author,body,img,createdAt,rating}=review
+                                createdAt = new Date(createdAt)
+                                return(
+                                    <div key={id}>
+                                        <div>
+                                            <div className="information">
+                                                <div className="user">
+                                                    <h3>{author.name}</h3>
+                                                </div>
+                                                <span>{createdAt.toLocaleString()}</span>
+                                                <div>
+                                                    {[1,2,3,4,5].map((num,id)=>{
+                                                        return <FaStar key={id} fill={rating>=num ? 'orange':'grey'}/>
+                                                    })}
+                                                </div>
+                                            </div>
+                                            <div className="desc">
+                                                <p>{body}</p>
+                                            </div>
+                                        </div>
+                                        <div className="imgBox">
+                                            {img && <img src={`http://localhost:4000/${img}`} alt=''></img> }
+                                        </div>
+                                    </div>
+                                )
+                            })}
                         </section>
                     </div>
                 </div>
-                <div className="modal">
-                    <Review/>
+                <div className={`modal ${modalOn ? 'on' : 'off'}`}>
+                    <Review setModal={setModalOn} recipeId={recipeData._id}reviewTitle={recipeTitle} reviewImg={finishedImgs[0].path||'./images/noImgs/no_image.gif'} />
                 </div>
             </>
         )

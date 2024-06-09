@@ -8,6 +8,7 @@ const {isAuth, isAdmin } = require('../../auth')
 const router = express.Router()
 const multer = require('multer')
 const path = require('path')
+const Review = require('../models/Review')
 const upload = multer({
     storage: multer.diskStorage({
         destination: function( req, file, cb){
@@ -97,6 +98,17 @@ router.post('/add-recipe',isAuth,expressAsyncHandler( async (req,res,next)=>{
     })
 }))
 
+router.post('/recommend',isAuth,expressAsyncHandler(async(req,res,next)=>{
+    const recipe = await Recipe.findOne({recipeId:req.body.id})
+    if(recipe){
+        recipe.recommended = recipe.recommended + req.body.num
+        await recipe.save()
+        res.json({success:true})
+    }else{
+        res.json({code:400,message:'오류발생',success:false})
+    }
+}))
+
 
 /* 전체레시피 불러오기 */
 router.get('/recipe-list',expressAsyncHandler(async (req,res,next)=>{
@@ -132,15 +144,16 @@ router.get('/recipe-list',expressAsyncHandler(async (req,res,next)=>{
 
 /* 상세보기 클릭시 특정레시피 조회 및 조회수 증가 */
 router.get('/:id',expressAsyncHandler(async(req,res,next)=>{
-    
-        const recipe = await Recipe.findOne({recipeId:req.params.id}).populate('cookingImgs',['-_id','path','order']).populate('author','-_id').populate('finishedImgs','-_id').populate('rating','-_id')
+    const recipe = await Recipe.findOne({recipeId:req.params.id}).populate('cookingImgs',['-_id','path','order']).populate('author','-_id').populate('finishedImgs','-_id').populate('rating','-_id')
+    const review = await Review.find({recipe:recipe._id}).populate('author',['name'])
         if(recipe){
             recipe.viewership = recipe.viewership + 1
             await recipe.save()
-            res.json({code:200, msg:'데이터를 불러왔습니다', recipe})
+            res.json({code:200, msg:'데이터를 불러왔습니다', recipe,review})
         }else{
             res.json({code:404,message:'페이지를 찾을 수 없습니다'})
         }
 }))
+
 
 module.exports = router

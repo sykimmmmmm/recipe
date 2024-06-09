@@ -3,8 +3,33 @@ const User = require('../models/User')
 const expressAsyncHandler = require('express-async-handler')
 const { generateToken, isAuth, isAdmin } = require('../../auth')
 const Counter = require('../models/Counter')
+const Review = require('../models/Review')
 const router = express.Router()
-
+const multer = require('multer')
+const path = require('path')
+const upload = multer({
+    storage: multer.diskStorage({
+        destination: function( req, file, cb){
+            cb(null,'public/uploads/')
+        },
+        filename: function(req, file, cb){
+            const ext = path.extname(file.originalname)
+            const filename = path.basename(btoa(file.originalname),ext)+'_'+ Date.now() + ext
+            cb(null, filename)
+        }
+    }),
+    fileFilter: function(req,file,cb){
+            const typeArray = file.mimetype.split('/')
+            const fileType = typeArray[0]
+            if(fileType === 'image'){
+                cb(null,true)
+            }else{
+                req.fileValidationError = 'jpg,png,jpeg,gif,webp등 이미지파일만 업로드가능합니다'
+                cb(null,false)
+            }
+        }
+    }
+)
 
 /* 회원가입 */
 router.post('/register',expressAsyncHandler(async(req,res,next)=>{
@@ -53,6 +78,28 @@ router.post('/login',expressAsyncHandler( async(req,res,next)=>{
             token: generateToken(loginUser),
             name,userId,isAdmin,createdAt
         })
+    }
+}))
+
+router.post('/review',isAuth,upload.single('img'),expressAsyncHandler(async(req,res,next)=>{
+    const user = User.findOne({_id:req.user._id})
+    console.log(req.body.rating)
+    console.log(req.body.body)
+    console.log(req.file)
+    const review = new Review({
+        author:req.user._id,
+        recipe:req.body.recipeId,
+        body:req.body.body,
+        rating:req.body.rating,
+        img:req.file? req.file.path.slice(7,req.file.path.length) : null
+    })
+    const newReview = await review.save()
+    if(newReview){
+        user.reviews.push(newReview)
+        await user.save()
+        res.json({code:200, message:'리뷰를 저장했습니다',newReview})
+    }else{
+        res.json({code:400, message:'리뷰 저장에 실패했습니다'})
     }
 }))
 

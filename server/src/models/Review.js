@@ -3,10 +3,6 @@ const { Schema } = mongoose
 const { Types: { ObjectId }} = Schema
 
 const reviewSchema = new Schema({
-    title:{
-        type:String,
-        required: true
-    },
     body:{
         type:String,
         required: true
@@ -30,6 +26,9 @@ const reviewSchema = new Schema({
     rating:{
         type: Number,
         required: true
+    },
+    img:{
+        type:String
     }
 })
 
