@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState,useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import './styles/Register.css';
 import axios from 'axios';
@@ -6,16 +6,15 @@ import axios from 'axios';
 export default function Register(){
     const navigation = useNavigate()
     const [loginData,setLoginData] = useState({})
+    const idRef= useRef()
     const fetchRegister = async(data)=>{
         const {email,name,userId,password,confirmPassword} = data
         if(email && name && userId && password && confirmPassword && password === confirmPassword){
             const register = await axios.post('http://localhost:4000/users/register',{email,name,userId,password,confirmPassword})
             .then(res => res.data)
             .catch(err=> err.response.data)
-            alert(register.msg)
             if(register.code===200){
-                return navigation("/")
-            }else if(register.code === 409){
+                alert('회원가입을 완료했습니다.')
                 return navigation("/user/login")
             }
         }else{
@@ -33,7 +32,12 @@ export default function Register(){
             box.append(div)
         }
     }
-
+    const duplicateId =async()=>{
+        const { userId } = loginData
+        const confirm = await axios.post('http://localhost:4000/users/confirmUser',{userId})
+        .then(res => res.data)
+        idRef.current.innerText = confirm.msg
+    }
     const loginInfo = (e)=>{
         const {name,value} = e.target
         setLoginData({...loginData,[name]:value})
@@ -58,10 +62,14 @@ export default function Register(){
                     </label>
                 </div>
                 <div className="userId">
-                    <label>
-                        아이디
-                        <input type="text" name="userId" placeholder="아이디를 입력하세요(4~20자)" onChange={loginInfo} required></input>
-                    </label>
+                    <div >
+                        <label>
+                            아이디
+                            <input type="text" name="userId" placeholder="아이디를 입력하세요(4~20자)" onChange={loginInfo} required></input>
+                        </label>
+                        <span className="confirmId" ref={idRef}></span>
+                    </div>
+                    <div className="duplicate" onClick={duplicateId}>중복확인</div>
                 </div>
                 <div className="password">
                     <label>

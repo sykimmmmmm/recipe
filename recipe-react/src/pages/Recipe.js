@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from "react";
 import axios from 'axios'
-import { useLocation } from "react-router-dom";
+import { useLocation,Link } from "react-router-dom";
 import { MdAutoGraph } from "react-icons/md";
 import { IoPeople, IoTime, IoThumbsUpSharp } from "react-icons/io5";
 import { FaStar } from "react-icons/fa6";
 import './styles/Recipe.css'
 import Review from "../Component/Review";
+
 export default function Recipe(){
     const [recipeData,setRecipeData] = useState(null)
     const [modalOn,setModalOn] = useState(false)
@@ -39,10 +40,10 @@ export default function Recipe(){
     }
     useEffect(()=>{
         axiosData()
-    },[success])
+    },[success,location.pathname])
     
     if(recipeData){
-        const {author:{name:nickname},finishedImgs,description,info,recipeTitle,ingredients,reviews}=recipeData
+        const {author:{name:nickname,userId},finishedImgs,description,info,recipeTitle,ingredients,reviews}=recipeData
         const steps = recipeData.steps
         const cookingImgs = recipeData.cookingImgs
         return(
@@ -50,13 +51,15 @@ export default function Recipe(){
                 <div className="body">
                     <div className="recipe-wrapper">
                         <section className='recipe-header'>
-                            {sessionStorage.getItem('I')&&<div className="recipe-review" onClick={reviewPopup}>리뷰 쓰기</div>}
+                            {sessionStorage.getItem('I')&&user!==userId&&<div className="recipe-review" onClick={reviewPopup}>리뷰 쓰기</div>}
                             <div className="recipe-thumbnailBox">
-                                {sessionStorage.getItem('I') && <div className="recipe-recommend"><IoThumbsUpSharp fill={ +localStorage.getItem(`recipe${id}${user}rc`) === 1 ?'blue' : 'white'} onClick={increaseRecommend}/></div>}
+                                {sessionStorage.getItem('I') && user!==userId&&<div className="recipe-recommend"><IoThumbsUpSharp fill={ +localStorage.getItem(`recipe${id}${user}rc`) === 1 ?'blue' : 'white'} onClick={increaseRecommend}/></div>}
                                 <img src={`http://localhost:4000/${finishedImgs[0].path}`} alt=''/>
                             </div>
                             <div className="recipe-desc">
-                                <div className="recipe-user">{nickname}</div>
+                                <Link to={`/user/mypage/${userId}`}>
+                                    <div className="recipe-user">{nickname}</div>
+                                </Link>
                                 <h2>{recipeTitle}</h2>
                                 <p>{description}</p>
                                 <div className='recipe-info'>
@@ -122,14 +125,16 @@ export default function Recipe(){
                             <section className="recipe-review">
                                 <h3>리뷰({reviews.length})</h3>
                                 {reviews.map((review,id)=>{
-                                let {author,body,img,createdAt,rating}=review
-                                createdAt = new Date(createdAt)
+                                    let {author,body,img,createdAt,rating}=review
+                                    createdAt = new Date(createdAt)
                                 return(
                                     <div key={id}>
                                         <div>
                                             <div className="information">
                                                 <div className="user">
-                                                    <h3>{author.name}</h3>
+                                                    <Link to={`/user/mypage/${author.userId}`}>
+                                                        <h3>{author.name}</h3>
+                                                    </Link>
                                                 </div>
                                                 <span>{createdAt.toLocaleString()}</span>
                                                 <div>

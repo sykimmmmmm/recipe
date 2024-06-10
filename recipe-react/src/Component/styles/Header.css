@@ -2,9 +2,10 @@
     box-sizing: border-box;
     width: 100%;
     height: 100px;
-    padding: 10px 10rem;
+    min-width: 1400px;
+    padding: 10px 5rem;
     display: flex;
-    justify-content: space-between;
+    justify-content: flex-start;
     align-items: center;
     position: sticky;
     top: 0;
@@ -26,16 +27,18 @@
 }
 .header .search{
     display: flex;
+    width: 300px;
     height: 100%;
     align-items: center;
     justify-content: center;
+    margin-left: 400px;
 }
 .header .search input{
     box-sizing: border-box;
     width: 260px;
     height: 50%;
     padding: 10px;
-    border: 1px solid #787878;
+    border: 1px solid #ddb485;
     border-radius: 10px 0 0 10px;
 }
 .header .search button{
@@ -45,9 +48,9 @@
     padding: 10px;
     background-color: #ddb485;
     border-radius: 0 10px 10px 0;
-    border-bottom: 1px solid #787878;
-    border-top: 1px solid #787878;
-    border-right: 1px solid #787878;
+    border-bottom: 1px solid #ddb485;
+    border-top: 1px solid #ddb485;
+    border-right: 1px solid #ddb485;
     height: 50%;
     color: white;
     font-size: 30px;
@@ -58,4 +61,21 @@
 .myinfo{
     display: flex;
     gap: 40px;
+    margin-left: auto;
+    align-items: center;
+}
+.header .randBtn{
+    all:unset;
+    cursor: pointer;
+    box-sizing: border-box;
+    padding: 10px;
+    border:1px solid #ddb485;
+    border-radius: 10px;
+}
+.header .randBtn:hover{
+    color: #fff;
+    background-color: #ddb485;
+}
+.header a:hover{
+    color:#ddb485;
 }

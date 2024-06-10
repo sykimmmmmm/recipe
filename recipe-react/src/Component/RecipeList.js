@@ -8,7 +8,7 @@ import { FaStar } from "react-icons/fa6";
 
 export default function RecipeList(){
     const [recipeList,setRecipeList] = useState([])
-    const [filter,setFilter] = useSearchParams()
+    const [filter,setFilter] = useSearchParams({type:'전체',situation:'전체',process:'전체',material:'전체'})
     const orderCategory=(e)=>{
         // console.log(e.target)
         filter.set('orderby',e.target.innerText)
@@ -35,7 +35,7 @@ export default function RecipeList(){
             })
         }
     }
-    console.log(recipeList)
+
     useEffect(()=>{
         axiosData(filter)
 

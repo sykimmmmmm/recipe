@@ -9,18 +9,19 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    background-color: #eee;
+    background-color: #fff;
 }
 .registerForm{
     /* border: 1px solid blue; */
     display: flex;
     flex-direction: column;
     justify-content: center;
-    align-items: center;
+    align-items: flex-start;
     gap: 10px;
     margin-bottom: 1rem;
     border-radius: 10px;
     background-color: #fff;
+    border: 1px solid #ddb485;
     box-shadow: 
     .1rem .1rem .1rem .1rem #ddb485,
     .1rem .1rem .1rem .1rem #fff,
@@ -57,4 +58,35 @@ input::placeholder{
     border: 2px solid #ddb485;
     background-color: #fff;
     cursor: pointer;
+}
+.register-btn button:hover{
+    background-color: #ddb485;
+    color: #fff;
+}
+.duplicate {
+    all: unset;
+    padding: 10px;
+    border-radius: 10px;
+    border: 2px solid #ddb485;
+    background-color: #fff;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 60px;
+    margin: 0 auto;
+}
+.duplicate:hover{
+    background-color: #ddb485;
+    color: #fff;
+}
+.registerForm .userId{
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+}
+.confirmId{
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }

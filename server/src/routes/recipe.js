@@ -151,7 +151,7 @@ router.get('/recipe-list',expressAsyncHandler(async (req,res,next)=>{
 
 /* 상세보기 클릭시 특정레시피 조회 및 조회수 증가 */
 router.get('/:id',expressAsyncHandler(async(req,res,next)=>{
-    const recipe = await Recipe.findOne({recipeId:req.params.id}).populate('cookingImgs',['-_id','path','order']).populate('author','-_id').populate('finishedImgs','-_id').populate({path:'reviews',populate:{path:'author',select:'name'}})
+    const recipe = await Recipe.findOne({recipeId:req.params.id}).populate('cookingImgs',['-_id','path','order']).populate('author','-_id').populate('finishedImgs','-_id').populate({path:'reviews',populate:{path:'author'}})
     const review = await Review.find({recipe:recipe._id}).populate('author',['name'])
         if(recipe){
             recipe.viewership = recipe.viewership + 1

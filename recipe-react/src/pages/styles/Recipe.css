@@ -23,7 +23,7 @@
 .recipe-wrapper .recipe-header .recipe-review{
     position: absolute;
     right: 10px;
-    bottom: 150px;
+    bottom: 10px;
     width: 75px;
     height: 75px;
     border-radius: 50%;

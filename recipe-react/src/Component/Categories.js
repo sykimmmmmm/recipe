@@ -18,10 +18,9 @@ export default function Categories({setFilterData}){
                 <span>종류별</span>
                     {type.map((value,id)=>{
                         return (
-                            <label key={id} htmlFor={`${value}type`}>{value}
-                                <input id={`${value}type`} name={'type'} value={value} type='radio' hidden  onChange={e=>searchFilter(e,id)}/>
+                        <label key={id} htmlFor={`${value}type`}>{value}
+                                <input id={`${value}type`} name={'type'} value={value} type='radio' hidden onChange={e=>searchFilter(e,id)} defaultChecked={id===0}/>
                             </label>
-                            
                         )
                     })}                
             </div>
@@ -30,7 +29,7 @@ export default function Categories({setFilterData}){
                     {situation.map((value,id)=>{
                         return (
                             <label key={id} htmlFor={`${value}situation`}>{value}
-                                <input id={`${value}situation`} name={'situation'} value={value} type='radio' hidden onChange={e=>searchFilter(e,id)}/>
+                                <input id={`${value}situation`} name={'situation'} value={value} type='radio' hidden onChange={e=>searchFilter(e,id)} defaultChecked={id===0}/>
                             </label>
                         )
                     })}                
@@ -40,7 +39,7 @@ export default function Categories({setFilterData}){
                     {process.map((value,id)=>{
                         return (
                             <label key={id} htmlFor={`${value}process`}>{value}
-                                <input id={`${value}process`} name={'process'} value={value} type='radio' hidden onChange={e=>searchFilter(e,id)}/>
+                                <input id={`${value}process`} name={'process'} value={value} type='radio' hidden onChange={e=>searchFilter(e,id)} defaultChecked={id===0}/>
                             </label>
                         )
                     })}                
@@ -50,7 +49,7 @@ export default function Categories({setFilterData}){
                     {material.map((value,id)=>{
                         return (
                             <label key={id} htmlFor={`${value}material`}>{value}
-                                <input id={`${value}material`} name={'material'} value={value} type='radio' hidden onChange={e=>searchFilter(e,id)}/>
+                                <input id={`${value}material`} name={'material'} value={value} type='radio' hidden onChange={e=>searchFilter(e,id)} defaultChecked={id===0}/>
                             </label>
                         )
                     })}                

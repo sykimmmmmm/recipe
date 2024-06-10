@@ -71,7 +71,7 @@ export default function AddRecipe(){
             let target = inputRef.current[key]
             let value = ''
             if(target.ingredient === ''||target.quantity === ''||target.unit === ''){
-                value = 'undefined'
+                value = ' '
             }else{
                 value = target.ingredient+''+target.quantity+''+target.unit
             }

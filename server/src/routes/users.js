@@ -32,9 +32,17 @@ const upload = multer({
     }
 )
 
+router.post('/confirmUser',expressAsyncHandler( async(req,res,next)=>{
+    const user = await User.findOne({userId:req.body.userId})
+    if(user){
+        res.json({code:409,msg:'중복된 아이디입니다'})
+    }else{
+        res.json({code:200,msg:'사용가능한 아이디입니다'})
+    }
+}))
 /* 회원가입 */
 router.post('/register',expressAsyncHandler(async(req,res,next)=>{
-    const user = await User.findOne({$or:[{email:req.body.email},{userId:req.body.userId}]})
+    const user = await User.findOne({userId:req.body.userId})
     if(user){
         res.status(409).json({code:409,msg:'이미 있는 사용자입니다'})
     }else{
@@ -64,13 +72,19 @@ router.post('/register',expressAsyncHandler(async(req,res,next)=>{
 
 /* 로그인 */
 router.post('/login',expressAsyncHandler( async(req,res,next)=>{
+    if(!req.body.userId){
+        res.json({code:404,message:'아이디를 입력해주세요'})
+    }
+    if(!req.body.password){
+        res.json({code:404,message:'비밀번호를 입력해주세요'})
+    }
     const loginUser = await User.findOne({
         userId: req.body.userId,
         password: req.body.password
     })
     if(!loginUser){
-        res.status(401).json({
-            code:401, message:'Invalid Email or Password'
+        res.json({
+            code:401, message:'아이디 혹은 비밀번호를 확인해주세요'
         })
     }else{
         const { name, userId, isAdmin, createdAt } = loginUser
@@ -82,6 +96,19 @@ router.post('/login',expressAsyncHandler( async(req,res,next)=>{
     }
 }))
 
+/* 마이페이지 */
+router.get('/mypage/:id',expressAsyncHandler(async(req,res,next)=>{
+    console.log(req.params)
+    const user = await User.findOne({userId:req.params.id}).populate({path:'recipes',populate:{path:'reviews'}}).populate({path:'recipes',populate:{path:'finishedImgs'}}).populate({path:'reviews',populate:{path:'recipe',populate:{path:'finishedImgs'}}})
+    if(user){
+        res.json({code:200,message:'success',user})
+    }else{
+        res.json({code:404,message:'해당 유저를 찾을 수 없습니다'})
+    }
+}))
+
+
+/* 리뷰작성 */
 router.post('/review',isAuth,upload.single('img'),expressAsyncHandler(async(req,res,next)=>{
     const user = await User.findOne({_id:req.user._id})
     const recipe = await Recipe.findOne({_id:req.body.recipeId})
