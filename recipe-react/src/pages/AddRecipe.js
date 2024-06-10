@@ -3,6 +3,7 @@ import IngredientForm from '../Component/IngredientForm';
 import axios from 'axios'
 import './styles/AddRecipe.css'
 import StepsForm from '../Component/StepsForm';
+import { useNavigate } from 'react-router-dom';
 const people = ['1인분','2인분','3인분','4인분','5인분','6인분 이상']
 const time = ['5분 이내','10분 이내','15분 이내','20분 이내','30분 이내','60분 이내','90분 이내','2시간 이내','2시간 이상']
 const difficult = ['누구나 가능','쉬움','보통','어려움','매우 어려움']
@@ -14,6 +15,7 @@ const material = ['소고기','돼지고기','닭고기','육류','채소류','�
 export default function AddRecipe(){
     const [recipeData,setRecipeData] = useState({'recipeTitle':'','name':'','description':'','people':'','time':'','difficult':'','ingredients0':'','steps':'','type':'','situation':'','process':'','material':''})
     const recipeRef = useRef({'recipeTitle':'','name':'','description':'','people':'','time':'','difficult':'','type':'','situation':'','process':'','material':''})
+    const navigate = useNavigate()
     // 레시피 정보 입력
     const inputRecipe = (e)=>{
         let {name, value} = e.target
@@ -44,10 +46,7 @@ export default function AddRecipe(){
             setUrlLink({...urlLink,[id]:{src: file&&file!=='undefined' && URL.createObjectURL(file)}})
         }
     }
-    // console.log(urlLink)
-    // console.log(prevFile[1])
-    // console.log(stepsRef.current[1]?stepsRef.current[1].file.name:'z')
-    // finishedImgs 정보 저장
+    /* 이미지 저장 */
     const finishedRef = useRef()
     const [finishedImages,setFinishedImages] = useState([])
     const imgs = [...finishedImages]
@@ -116,7 +115,7 @@ export default function AddRecipe(){
             finishedImages.forEach(img=>{
                 fd.append('finishedImgs',img.file)
             })
-            console.log(stepsRef.current[0])
+            // console.log(stepsRef.current[0])
             await axios.post('recipes/upload',fd,{headers:{'Content-Type':'multipart/form-data','Authorization':`Bearer ${token}`}})
             .then(res => {
                 res.data.cookingImgs && res.data.cookingImgs.forEach(data=>{
@@ -142,6 +141,7 @@ export default function AddRecipe(){
                 const {message} = res.data
                 // console.log(res.data)
                 alert(message)
+                navigate('/')
             })
             .catch(e=>{
                 console.log(e)

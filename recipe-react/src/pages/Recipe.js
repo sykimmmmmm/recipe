@@ -7,43 +7,42 @@ import { FaStar } from "react-icons/fa6";
 import './styles/Recipe.css'
 import Review from "../Component/Review";
 export default function Recipe(){
-    const [recipeData,setRecipeData] = useState()
-    const [reviewData,setReviewData] = useState(null)
+    const [recipeData,setRecipeData] = useState(null)
     const [modalOn,setModalOn] = useState(false)
     const [success,setSuccess] = useState(null)
     const location = useLocation()
     const id = location.pathname.slice(8,location.pathname.length)
+    const user = JSON.parse(sessionStorage.getItem('Id'))
     const axiosData = async()=>{
-        const id = location.pathname.slice(8,location.pathname.length)
+        // const id = location.pathname.slice(8,location.pathname.length)
         const viewership = await axios.get(`http://localhost:4000/recipes/${id}`)
-        .then(res => {
-            setReviewData(res.data.review)
-            return res.data.recipe})
+        .then(res => res.data.recipe)
         .catch(e=>console.log(e.response))
         setRecipeData(viewership)
     }
     const reviewPopup =()=>{
         setModalOn(true)
     }
+    // console.log(recipeData)
     const increaseRecommend = async()=>{
-        const id = location.pathname.slice(8,location.pathname.length)
+        // const id = location.pathname.slice(8,location.pathname.length)
         const token = JSON.parse(atob(sessionStorage.getItem('I')))
-        if(+localStorage.getItem(`recipe${id}rc`) === -1){
-            localStorage.setItem(`recipe${id}rc`,1)
-            axios.post('recipes/recommend',{num:1,id:id},{headers:{Authorization:`Bearer ${token}`}})
+        if(+localStorage.getItem(`recipe${id}${user}rc`) === 1){
+            localStorage.setItem(`recipe${id}${user}rc`,-1)
+            axios.post('recipes/recommend',{num:-1,id:id},{headers:{Authorization:`Bearer ${token}`}})
             .then(res=>setSuccess(res.data.success))
         }else{
-            localStorage.setItem(`recipe${id}rc`,-1)
-            axios.post('recipes/recommend',{num:-1,id:id},{headers:{Authorization:`Bearer ${token}`}})
+            localStorage.setItem(`recipe${id}${user}rc`,1)
+            axios.post('recipes/recommend',{num:1,id:id},{headers:{Authorization:`Bearer ${token}`}})
             .then(res=>setSuccess(res.data.success))
         }
     }
     useEffect(()=>{
         axiosData()
-    },[])
+    },[success])
     
     if(recipeData){
-        const {author:{name:nickname},finishedImgs,description,info,recipeTitle,ingredients}=recipeData
+        const {author:{name:nickname},finishedImgs,description,info,recipeTitle,ingredients,reviews}=recipeData
         const steps = recipeData.steps
         const cookingImgs = recipeData.cookingImgs
         return(
@@ -53,7 +52,7 @@ export default function Recipe(){
                         <section className='recipe-header'>
                             {sessionStorage.getItem('I')&&<div className="recipe-review" onClick={reviewPopup}>리뷰 쓰기</div>}
                             <div className="recipe-thumbnailBox">
-                                {sessionStorage.getItem('I') && <div className="recipe-recommend"><IoThumbsUpSharp fill={ +localStorage.getItem(`recipe${id}rc`) === 1 ?'blue' : 'white'} onClick={increaseRecommend}/></div>}
+                                {sessionStorage.getItem('I') && <div className="recipe-recommend"><IoThumbsUpSharp fill={ +localStorage.getItem(`recipe${id}${user}rc`) === 1 ?'blue' : 'white'} onClick={increaseRecommend}/></div>}
                                 <img src={`http://localhost:4000/${finishedImgs[0].path}`} alt=''/>
                             </div>
                             <div className="recipe-desc">
@@ -119,9 +118,10 @@ export default function Recipe(){
                                 })}
                             </div>
                         </section>
-                        <section className="recipe-review">
-                            {reviewData && <h3>리뷰({reviewData.length})</h3>}
-                            {reviewData && reviewData.map((review,id)=>{
+                        {reviews.length>0 &&
+                            <section className="recipe-review">
+                                <h3>리뷰({reviews.length})</h3>
+                                {reviews.map((review,id)=>{
                                 let {author,body,img,createdAt,rating}=review
                                 createdAt = new Date(createdAt)
                                 return(
@@ -148,11 +148,11 @@ export default function Recipe(){
                                     </div>
                                 )
                             })}
-                        </section>
+                        </section>}
                     </div>
                 </div>
                 <div className={`modal ${modalOn ? 'on' : 'off'}`}>
-                    <Review setModal={setModalOn} recipeId={recipeData._id}reviewTitle={recipeTitle} reviewImg={finishedImgs[0].path||'./images/noImgs/no_image.gif'} />
+                    <Review setModal={setModalOn} setSuccess={setSuccess}recipeId={recipeData._id}reviewTitle={recipeTitle} reviewImg={finishedImgs[0].path||'./images/noImgs/no_image.gif'} />
                 </div>
             </>
         )

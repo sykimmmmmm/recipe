@@ -102,6 +102,9 @@ router.post('/recommend',isAuth,expressAsyncHandler(async(req,res,next)=>{
     const recipe = await Recipe.findOne({recipeId:req.body.id})
     if(recipe){
         recipe.recommended = recipe.recommended + req.body.num
+        if(recipe.recommended < 0){
+            recipe.recommended = 0
+        }
         await recipe.save()
         res.json({success:true})
     }else{
@@ -112,28 +115,32 @@ router.post('/recommend',isAuth,expressAsyncHandler(async(req,res,next)=>{
 
 /* 전체레시피 불러오기 */
 router.get('/recipe-list',expressAsyncHandler(async (req,res,next)=>{
-    let recipe = await Recipe.find({open:true}).populate('cookingImgs',['-_id','path','order']).populate('author','-_id').populate('finishedImgs','-_id').populate('rating','-_id')
-    let {type, situation, process, material,name} = req.query
-    console.log(type,situation,process,material,name)
+    let recipe = await Recipe.find({open:true}).populate('cookingImgs',['-_id','path','order']).populate('author','-_id').populate('finishedImgs','-_id').populate('reviews','-_id')
+    let {type, situation, process, material,name,orderby} = req.query
+    console.log(type,situation,process,material,name,orderby)
     /* query 조건부 필터링 */
     if(name !== undefined){
         recipe = recipe.filter(recipe=> recipe.name.includes(name))
     }
 
-    if(type !== undefined && req.query.type !== '전체'){
+    if(type !== undefined && type !== '전체'){
         recipe = recipe.filter(recipe => recipe.category.includes(type))
     }
     
-    if(situation !== undefined && req.query.situation !== '전체'){
+    if(situation !== undefined && situation !== '전체'){
         recipe = recipe.filter(recipe => recipe.category.includes(situation))
     }
 
-    if(process !== undefined  && req.query.process !== '전체'){
+    if(process !== undefined  && process !== '전체'){
         recipe = recipe.filter(recipe => recipe.category.includes(process))
     }
 
-    if(material !== undefined && req.query.material !== '전체'){
+    if(material !== undefined && material !== '전체'){
         recipe = recipe.filter(recipe => recipe.category.includes(material))
+    }
+    if(orderby !== undefined && orderby !=='정렬초기화'){
+        orderby === '조회수' ? orderby='viewership' : orderby='recommended'
+        recipe = recipe.sort((recipe1,recipe2)=> recipe2[orderby] - recipe1[orderby])
     }
     if(recipe.length>0){
         res.send(recipe)
@@ -144,7 +151,7 @@ router.get('/recipe-list',expressAsyncHandler(async (req,res,next)=>{
 
 /* 상세보기 클릭시 특정레시피 조회 및 조회수 증가 */
 router.get('/:id',expressAsyncHandler(async(req,res,next)=>{
-    const recipe = await Recipe.findOne({recipeId:req.params.id}).populate('cookingImgs',['-_id','path','order']).populate('author','-_id').populate('finishedImgs','-_id').populate('rating','-_id')
+    const recipe = await Recipe.findOne({recipeId:req.params.id}).populate('cookingImgs',['-_id','path','order']).populate('author','-_id').populate('finishedImgs','-_id').populate({path:'reviews',populate:{path:'author',select:'name'}})
     const review = await Review.find({recipe:recipe._id}).populate('author',['name'])
         if(recipe){
             recipe.viewership = recipe.viewership + 1

@@ -3,7 +3,7 @@ import './styles/Review.css'
 import { FaStar } from "react-icons/fa6";
 import axios from "axios";
 
-export default function Review({recipeId,setModal,reviewTitle,reviewImg}){
+export default function Review({recipeId,setModal,setSuccess,reviewTitle,reviewImg}){
     if(reviewImg.includes('uploads')){
         reviewImg = 'http://localhost:4000/'+reviewImg
     }
@@ -41,11 +41,11 @@ export default function Review({recipeId,setModal,reviewTitle,reviewImg}){
             fd.append('img',imgRef.current.files[0])
         }
         const token = JSON.parse(atob(sessionStorage.getItem('I')))
-        console.log(token)
         await axios.post('users/review',fd,{headers:{'Authorization':`Bearer ${token}`,"Content-Type":"multipart/form-data"}})
         .then(res=>{
             alert(res.data.message)
             setModal(false)
+            setSuccess(true)
         })
     }
 

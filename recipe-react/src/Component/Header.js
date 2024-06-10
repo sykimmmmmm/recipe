@@ -31,6 +31,7 @@ export default function Header(){
             <div className="myinfo">
                 {sessionStorage.getItem('I') ? 
                 <>
+                    <Link to={'/add-recipe'}>레시피등록</Link>
                     <Link to={'/user/mypage'}>마이페이지</Link>
                     <Link to={'/'} onClick={logout}>로그아웃</Link>
                 </>:

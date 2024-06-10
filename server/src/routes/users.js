@@ -7,6 +7,7 @@ const Review = require('../models/Review')
 const router = express.Router()
 const multer = require('multer')
 const path = require('path')
+const Recipe = require('../models/Recipe')
 const upload = multer({
     storage: multer.diskStorage({
         destination: function( req, file, cb){
@@ -82,10 +83,8 @@ router.post('/login',expressAsyncHandler( async(req,res,next)=>{
 }))
 
 router.post('/review',isAuth,upload.single('img'),expressAsyncHandler(async(req,res,next)=>{
-    const user = User.findOne({_id:req.user._id})
-    console.log(req.body.rating)
-    console.log(req.body.body)
-    console.log(req.file)
+    const user = await User.findOne({_id:req.user._id})
+    const recipe = await Recipe.findOne({_id:req.body.recipeId})
     const review = new Review({
         author:req.user._id,
         recipe:req.body.recipeId,
@@ -97,6 +96,8 @@ router.post('/review',isAuth,upload.single('img'),expressAsyncHandler(async(req,
     if(newReview){
         user.reviews.push(newReview)
         await user.save()
+        recipe.reviews.push(newReview)
+        await recipe.save()
         res.json({code:200, message:'리뷰를 저장했습니다',newReview})
     }else{
         res.json({code:400, message:'리뷰 저장에 실패했습니다'})

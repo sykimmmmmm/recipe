@@ -44,7 +44,7 @@ export default function Register(){
             <div>
                 <h3>회원가입</h3>
             </div>
-            <form className="loginForm">
+            <form className="registerForm">
                 <div className="nickName">
                     <label>
                         닉네임
@@ -60,7 +60,7 @@ export default function Register(){
                 <div className="userId">
                     <label>
                         아이디
-                        <input type="text" name="userId" placeholder="아이디를 입력하세요(6~20자)" onChange={loginInfo} required></input>
+                        <input type="text" name="userId" placeholder="아이디를 입력하세요(4~20자)" onChange={loginInfo} required></input>
                     </label>
                 </div>
                 <div className="password">

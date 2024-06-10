@@ -62,10 +62,7 @@ const recipeSchema = new Schema({
         type: Date,
         default: Date.now
     },
-    rating:{
-        type:ObjectId,
-        ref:'Review'
-    },
+    reviews:[{type:ObjectId, ref:'Review'}],
     recipeId:{
         type:Number,
         default:1

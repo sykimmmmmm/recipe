@@ -9,9 +9,9 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    background-color: #DED0C0;
+    background-color: #eee;
 }
-.loginForm{
+.registerForm{
     /* border: 1px solid blue; */
     display: flex;
     flex-direction: column;
@@ -26,15 +26,15 @@
     .1rem .1rem .1rem .1rem #fff,
     .1rem .1rem .1rem .1rem #000;
 }
-.loginForm label{
+.registerForm label{
     padding: 10px 20px;
     display: flex;
     flex-direction: column;
 }
-.loginForm label:nth-last-of-type(1){
+.registerForm label:nth-last-of-type(1){
     margin-bottom: 1.5rem;
 }
-.loginForm input{
+.registerForm input{
     margin-left: 10px;
     width: 300px;
     padding: 10px;

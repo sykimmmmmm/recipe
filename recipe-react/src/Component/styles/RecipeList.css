@@ -1,6 +1,5 @@
 .recipe-wrap{
     box-sizing: border-box;
-    border: 1px solid green;
     min-width: 1024px;
     margin: 0 auto;
     padding: 1rem 5rem;
@@ -13,10 +12,11 @@
     box-sizing: border-box;
     display: flex;
     flex-direction: column;
+    width: 250px;
 }
 .recipe-box .imgBox{
-    width: 200px;
-    height: 180px;
+    width: 250px;
+    height: 200px;
     margin-bottom: 20px;
     border: 1px solid #d5d5d5;
     border-radius: 10px;
@@ -30,12 +30,20 @@
     display: flex;
     flex-direction: column;
     gap: 10px;
+    justify-content: flex-start;
+    align-items: center;
 }
 .recipe-box .recipe-info *{
     margin: 0;
     padding: 0;
 }
-
+.recipe-box .recipe-view{
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 10px;
+    font-size: 14px;
+}
 .category{
     box-sizing: border-box;
     min-width: 1024px;
@@ -43,7 +51,7 @@
     width: 100vw;
     display: flex;
     flex-direction: column;
-    border: 1px solid blue;
+    border-bottom: 1px solid #ddb485;
 }
 .category > div{
     margin-bottom: 5px;
@@ -70,4 +78,17 @@
     color: #fff;
     background-color: #ddb485;
     border-radius: 10px;
+}
+.cat{
+    display: flex;
+    gap: 50px;
+    padding: 1rem 5rem;
+    justify-content: flex-end;
+    align-items: center;
+}
+.cat span{
+    cursor: pointer;
+}
+.cat span:hover{
+    color: #ddb485;
 }
