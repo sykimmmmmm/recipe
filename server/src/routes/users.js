@@ -32,6 +32,7 @@ const upload = multer({
     }
 )
 
+/* 중복유저확인 */
 router.post('/confirmUser',expressAsyncHandler( async(req,res,next)=>{
     const user = await User.findOne({userId:req.body.userId})
     if(user){
@@ -40,6 +41,8 @@ router.post('/confirmUser',expressAsyncHandler( async(req,res,next)=>{
         res.json({code:200,msg:'사용가능한 아이디입니다'})
     }
 }))
+
+
 /* 회원가입 */
 router.post('/register',expressAsyncHandler(async(req,res,next)=>{
     const user = await User.findOne({userId:req.body.userId})

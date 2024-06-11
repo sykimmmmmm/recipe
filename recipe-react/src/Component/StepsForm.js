@@ -101,7 +101,7 @@ const StepsForm = forwardRef(({changeHandler,url},ref)=>{
                         onChange={(e)=> changeHandler(0,'steps',e.target.value)} />
                     </label>
                     <input hidden type={'file'} accept={'image/*'} name='recipeImage0' onChange={(e)=> changeHandler(0,'file',e.target.files[0])} ref={el=>fileRef.current[0]=el}/>
-                    <div onClick={(e)=>fileOpen(e,'0')}>{urlLink && urlLink[0] !==undefined && urlLink[0].src !=='' ?<img src={urlLink[0].src} alt='이미지 없음' style={{width:'200px',height:'200px'}}/>:<img src="./images/etc/addImage.png" alt="이미지추가"/>}</div>
+                    <div onClick={(e)=>fileOpen(e,'0')}>{urlLink && urlLink[0] !==undefined && urlLink[0].src !=='' &&ref.current[0].file !== '' ?<img src={urlLink[0].src} alt='이미지 없음' style={{width:'200px',height:'200px'}}/>:<img src="./images/etc/addImage.png" alt="이미지추가"/>}</div>
                 </div>
             </div>
             {stepForm.length>0 && stepForm.map((value)=>{

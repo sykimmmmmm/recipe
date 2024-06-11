@@ -98,6 +98,7 @@ router.post('/add-recipe',isAuth,expressAsyncHandler( async (req,res,next)=>{
     })
 }))
 
+/* 레시피 추천 */
 router.post('/recommend',isAuth,expressAsyncHandler(async(req,res,next)=>{
     const recipe = await Recipe.findOne({recipeId:req.body.id})
     if(recipe){

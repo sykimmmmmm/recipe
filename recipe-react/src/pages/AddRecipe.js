@@ -70,10 +70,13 @@ export default function AddRecipe(){
         keys.forEach((key)=>{
             let target = inputRef.current[key]
             let value = ''
+            let ingredient = target.ingredient !== '' ? target.ingredient : ' '
+            let quantity = target.quantity !== '' ? target.quantity : ' '
+            let unit = target.unit !== '' ? target.unit : ' '
             if(target.ingredient === ''||target.quantity === ''||target.unit === ''){
-                value = ' '
+                value = 'undefined'
             }else{
-                value = target.ingredient+''+target.quantity+''+target.unit
+                value = ingredient+''+quantity+''+unit
             }
             ingredients.push(value)
         })
